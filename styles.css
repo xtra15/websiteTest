@@ -577,3 +577,33 @@ footer p {
         height: 300px; /* Even smaller for very small screens */
     }
 }
+
+/* Shirt Toggle Button Styles */
+.shirt-toggle-btn {
+    display: none; /* Hidden by default on desktop */
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--gold);
+    color: var(--midnight-black);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.shirt-toggle-btn:hover {
+    background-color: #B8942F;
+}
+
+/* Show toggle button only on mobile devices */
+@media (max-width: 992px) {
+    .shirt-toggle-btn {
+        display: block;
+    }
+}
