@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
-            alert('Thank you for your interest in Ilham Shirts! We will contact you soon with pre-order details.');
+            alert('Thank you for your interest in Opposite Shirts! We will contact you soon with pre-order details.');
             modal.style.display = 'none';
             form.reset();
         });
@@ -50,4 +50,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Shirt image toggle functionality
+    const shirtToggleBtn = document.getElementById('shirt-toggle');
+    const frontShirt = document.querySelector('.about-image.front');
+    const backShirt = document.querySelector('.about-image.back');
+    
+    if (shirtToggleBtn) {
+        shirtToggleBtn.addEventListener('click', function() {
+            if (frontShirt.style.opacity === '0') {
+                // Currently showing back, switch to front
+                frontShirt.style.opacity = '1';
+                backShirt.style.opacity = '0';
+                shirtToggleBtn.textContent = 'View Back';
+            } else {
+                // Currently showing front, switch to back
+                frontShirt.style.opacity = '0';
+                backShirt.style.opacity = '1';
+                shirtToggleBtn.textContent = 'View Front';
+            }
+        });
+    }
 });
