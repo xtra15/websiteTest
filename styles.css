@@ -1,0 +1,579 @@
+/* Ilham Shirts - Luxury Pre-Order Site Styles */
+
+/* CSS Variables for Luxury Color Palette */
+:root {
+    --midnight-black: #0A0F14;
+    --cream-white: #F8F5F0;
+    --platinum: #E6E0D4;
+    --gold: #D4AF37;
+    --silver: #C0C0C0;
+    --transition: all 0.3s ease;
+}
+
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Georgia, serif;
+    background-color: var(--midnight-black);
+    color: var(--cream-white);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1, h2, h3 {
+    font-family: Georgia, serif;
+    font-weight: 700;
+}
+
+/* Header Styles */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: rgba(10, 15, 20, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    padding: 1rem 0;
+    transition: var(--transition);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.logo {
+    height: 50px;
+    width: auto;
+    transition: var(--transition);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.logo:hover {
+    transform: scale(1.05) translateX(-50%);
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+nav a {
+    color: var(--cream-white);
+    text-decoration: none;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+nav a:hover {
+    color: var(--gold);
+}
+
+/* Hero Section */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(rgba(10, 15, 20, 0.7), rgba(10, 15, 20, 0.7)), url('https://source.unsplash.com/random/1600x900/?luxury,shirt') no-repeat center center;
+    background-size: cover;
+    padding: 0 20px;
+    text-align: center;
+    margin-top: 80px; /* Account for fixed header */
+}
+
+.hero-content {
+    z-index: 2;
+    max-width: 800px;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+}
+
+.hero p {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.hero-button {
+    background-color: var(--gold);
+    color: var(--midnight-black);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0;
+    cursor: pointer;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.hero-button:hover {
+    background-color: #B8942F;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+}
+
+/* About Us Section */
+.about-us {
+    padding: 100px 0;
+    background-color: var(--midnight-black);
+}
+
+.about-content {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    opacity: 0;
+    transform: translateX(-50px);
+    animation: slideInLeft 1s ease-out 0.5s forwards;
+}
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.about-image-container {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 650px; /* Increased height */
+    perspective: 1000px;
+}
+
+.about-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+   
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.8s ease-in-out;
+}
+
+.about-image.front {
+    transform: translateX(-100%);
+    animation: slideImageInLeft 1s ease-out 1s forwards;
+    opacity: 1; /* Initially visible */
+}
+
+.about-image.back {
+    opacity: 0; /* Initially hidden */
+}
+
+/* Fade effect on hover */
+.about-image-container:hover .about-image.front {
+    opacity: 0; /* Fade out front image */
+}
+
+.about-image-container:hover .about-image.back {
+    opacity: 1; /* Fade in back image */
+}
+
+@keyframes slideImageInLeft {
+    to {
+        transform: translateX(0);
+    }
+}
+
+.about-text {
+    flex: 1;
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideInRight 1s ease-out 1s forwards;
+}
+
+@keyframes slideInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.about-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.about-text h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background-color: var(--gold);
+}
+
+.about-text p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    opacity: 0.9;
+}
+
+.luxury-details {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.detail-item {
+    text-align: center;
+}
+
+.detail-number {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+}
+
+.detail-text {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+/* Brand Story Section */
+.brand-story {
+    padding: 150px 0;
+    background-color: var(--midnight-black);
+    text-align: center;
+}
+
+.brand-story h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    display: inline-block;
+}
+
+.brand-story h2::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 2px;
+    background-color: var(--gold);
+}
+
+.brand-story p {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    opacity: 0.9;
+}
+
+/* Pre-Order Section */
+.pre-order {
+    padding: 150px 0;
+    text-align: center;
+    background: linear-gradient(to bottom, var(--midnight-black), #1a1f24);
+    position: relative;
+}
+
+.pre-order::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+}
+
+.pre-order h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.pre-order p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+}
+
+.preorder-button {
+    background-color: var(--gold);
+    color: var(--midnight-black);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0;
+    cursor: pointer;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.preorder-button:hover {
+    background-color: #B8942F;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+}
+
+/* Footer */
+footer {
+    padding: 3rem 0;
+    text-align: center;
+    background-color: rgba(10, 15, 20, 0.9);
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+footer p {
+    margin-bottom: 1rem;
+    opacity: 0.8;
+    font-size: 0.9rem;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.social-links a {
+    color: var(--gold);
+    text-decoration: none;
+    transition: var(--transition);
+    margin: 0 10px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.social-links a:hover {
+    color: var(--cream-white);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(10, 15, 20, 0.95);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--cream-white);
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 0;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+    color: var(--midnight-black);
+    animation: fadeIn 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    color: var(--midnight-black);
+    float: right;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+}
+
+.close:hover {
+    color: var(--gold);
+}
+
+.modal h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+    color: var(--midnight-black);
+}
+
+.modal p {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--midnight-black);
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal input {
+    padding: 0.75rem;
+    border: 1px solid var(--platinum);
+    border-radius: 0;
+    font-size: 1rem;
+    font-family: Georgia, serif;
+    background-color: rgba(248, 245, 240, 0.7);
+}
+
+.modal button {
+    background-color: var(--gold);
+    color: var(--midnight-black);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 0;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal button:hover {
+    background-color: #B8942F;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .about-content {
+        flex-direction: column;
+    }
+    
+    .luxury-details {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .about-image-container {
+        height: 400px; /* Adjusted height for mobile */
+    }
+    
+    nav ul {
+        flex-direction: row;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero p {
+        font-size: 1.1rem;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        gap: 1rem;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--midnight-black);
+        padding: 1rem;
+        display: none;
+    }
+    
+    .brand-story, .pre-order, .about-us {
+        padding: 80px 0;
+    }
+    
+    .brand-story h2, .pre-order h2, .about-text h2 {
+        font-size: 2rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20% auto;
+        padding: 1.5rem;
+    }
+    
+    .about-us {
+        padding: 100px 0 50px 0;
+    }
+    
+    .about-image-container {
+        height: 350px; /* Further adjusted height for smaller screens */
+    }
+    
+    .hero {
+        margin-top: 100px; /* Adjust for taller mobile header */
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-button, .preorder-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .brand-story h2, .pre-order h2, .about-text h2 {
+        font-size: 1.8rem;
+    }
+    
+    .luxury-details {
+        gap: 1rem;
+    }
+    
+    .detail-number {
+        font-size: 1.2rem;
+    }
+    
+    .about-image-container {
+        height: 300px; /* Even smaller for very small screens */
+    }
+}
