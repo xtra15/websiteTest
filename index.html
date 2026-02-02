@@ -12,7 +12,7 @@
       --text-main: #ffffff;
       --text-muted: #a1a1aa;
       --border: rgba(255, 255, 255, 0.1);
-      --card-bg: rgba(20, 20, 20, 0.7); /* Slightly darker for better TV contrast */
+      --card-bg: rgba(20, 20, 20, 0.7);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +22,7 @@
       color: var(--text-main);
       font-family: 'Inter', sans-serif;
       overflow: hidden;
-      font-size: 20px; /* Base size increased for TV */
+      font-size: 20px;
     }
 
     /* BACKGROUND */
@@ -33,7 +33,7 @@
       background-image: 
         linear-gradient(rgba(255, 255, 255, 0.03) 2px, transparent 2px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 2px, transparent 2px);
-      background-size: 60px 60px; /* Bigger grid */
+      background-size: 60px 60px;
     }
     .background-layer::after {
       content: '';
@@ -60,18 +60,18 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 1rem; /* Reduced padding to let card grow */
+      padding: 1rem;
       perspective: 1000px;
     }
 
-    /* --- GIANT GLASS CARD --- */
+    /* GIANT GLASS CARD */
     .glass-card {
       background: var(--card-bg);
       backdrop-filter: blur(15px);
       border: 1px solid var(--border);
       border-radius: 30px;
-      padding: 4rem; /* Big internal padding */
-      max-width: 1600px; /* Much wider for TV */
+      padding: 4rem;
+      max-width: 1600px;
       width: 95%;
       box-shadow: 0 30px 60px rgba(0,0,0,0.6);
       
@@ -87,7 +87,7 @@
       transform: scale(1) translateY(0);
     }
 
-    /* --- MASSIVE TYPOGRAPHY --- */
+    /* TYPOGRAPHY */
     h1 { font-size: 7rem; font-weight: 800; letter-spacing: -3px; margin: 0; text-align: center; line-height: 1.1; }
     h2 { font-size: 3.5rem; font-weight: 700; margin-bottom: 2rem; color: #fff; border-bottom: 2px solid var(--border); padding-bottom: 15px; display: inline-block; }
     p { font-size: 1.5rem; color: var(--text-muted); line-height: 1.6; }
@@ -103,7 +103,7 @@
     .dream-job { font-size: 1.8rem; color: #fff; font-weight: 500; display: flex; align-items: center; gap: 12px; }
     .dream-job::before { content: '▹'; color: var(--accent); font-size: 2rem; }
 
-    /* SLIDE 3: PREFERENCES (3 Columns) */
+    /* SLIDE 3: PREFERENCES */
     .comparison-container { 
       display: grid; 
       grid-template-columns: 1fr 1fr 1fr; 
@@ -137,46 +137,67 @@
       overflow: hidden;
       border: 1px solid var(--border);
       position: relative;
+      /* Removed height to let text define size */
     }
-    .mini-hobby img {
-      width: 100%;
-      height: 120px; /* Taller images */
-      object-fit: cover;
-      display: block;
-      transition: transform 0.3s;
-    }
-    .mini-hobby:hover img { transform: scale(1.1); }
+    /* Removed image styles since images are gone */
     .mini-hobby-text {
-      padding: 10px;
-      background: rgba(0,0,0,0.6);
-      font-size: 1.2rem;
+      padding: 20px; /* Increased padding for text-only view */
+      background: rgba(255,255,255,0.05); /* Changed background for text-only view */
+      font-size: 1.4rem; /* Increased font size */
       font-weight: 600;
       text-align: center;
-      position: absolute;
-      bottom: 0; width: 100%;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      /* Removed absolute positioning */
+      color: #fff;
     }
 
-    /* SLIDE 4: FRIENDS */
+    /* SLIDE 4: FRIENDS (Uniform Layout) */
     .friends-container { display: flex; flex-direction: column; gap: 2rem; margin-top: 1.5rem; }
-    .friend-row { display: flex; align-items: center; gap: 3rem; background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 24px; border: 1px solid var(--border); transition: transform 0.3s; }
-    .friend-row:hover { transform: scale(1.01); background: rgba(255,255,255,0.05); }
     
-    .friend-row.top { flex-direction: row; text-align: left; }
-    .friend-row.bottom { flex-direction: row-reverse; text-align: right; }
+    .friend-row { 
+      display: flex; 
+      align-items: center; 
+      gap: 3rem; 
+      background: rgba(255,255,255,0.03); 
+      padding: 2rem; 
+      border-radius: 24px; 
+      border: 1px solid var(--border); 
+      transition: transform 0.3s;
+      text-align: left; 
+    }
+    
+    .friend-row:hover { transform: scale(1.01); background: rgba(255,255,255,0.05); }
 
     .friend-visual { display: flex; flex-direction: column; align-items: center; min-width: 180px; }
-    .avatar { width: 130px; height: 130px; border-radius: 50%; background: #333; object-fit: cover; border: 3px solid var(--border); margin-bottom: 15px; }
+    
+    .avatar { 
+      width: 130px; 
+      height: 130px; 
+      border-radius: 50%; 
+      background: #333; 
+      object-fit: cover; 
+      border: 3px solid var(--border); 
+      margin-bottom: 15px; 
+    }
+    
     .friend-name { font-weight: 700; font-size: 1.6rem; color: #fff; }
-    .friend-desc { font-size: 1.4rem; color: var(--text-muted); line-height: 1.5; flex: 1; }
+    
+    .friend-desc { 
+      font-size: 1.3rem; 
+      color: var(--text-muted); 
+      line-height: 1.5; 
+      flex: 1; 
+      border-left: 2px solid rgba(255,255,255,0.1); 
+      padding-left: 2rem;
+    }
 
-    /* Helper for small screens (Fall back) */
+    /* Mobile Fallback */
     @media (max-width: 1000px) {
       h1 { font-size: 4rem; }
       h2 { font-size: 2.5rem; }
       .comparison-container { grid-template-columns: 1fr; }
       .biodata-grid { grid-template-columns: 1fr; }
       .friend-row.top, .friend-row.bottom { flex-direction: column; text-align: center; }
+      .friend-desc { border-left: none; padding-left: 0; border-top: 2px solid rgba(255,255,255,0.1); padding-top: 1rem; margin-top: 1rem; }
     }
   </style>
 </head>
@@ -249,12 +270,10 @@
             <div class="panel-title">Hobbies</div>
             
             <div class="mini-hobby">
-              <img src="https://picsum.photos/400/200?random=20" alt="Minecraft">
               <div class="mini-hobby-text">Minecraft</div>
             </div>
 
             <div class="mini-hobby">
-              <img src="https://picsum.photos/400/200?random=21" alt="Anime">
               <div class="mini-hobby-text">Watching Anime</div>
             </div>
 
@@ -271,21 +290,21 @@
           
           <div class="friend-row top">
             <div class="friend-visual">
-              <img src="imagefolder/iman.jpg" alt="Friend" class="avatar">
+              <img src="imagefolder/iman.jpg" alt="Iman" class="avatar">
               <div class="friend-name">Iman</div>
             </div>
             <div class="friend-desc">
-             My friend since middle school and we always used to play roblox together
+              My friend since middle school. We always used to play Roblox together.
             </div>
           </div>
 
           <div class="friend-row bottom">
+            <div class="friend-visual">
+              <img src="imagefolder/saif.jpg" alt="Saif" class="avatar">
+              <div class="friend-name">Saif</div>
+            </div>
             <div class="friend-desc">
               shorter than me and we also used to play duo in mobile legends and I like to tease him with someone he likes at middle school
-            </div>
-            <div class="friend-visual">
-              <img src="imagefolder/saif.jpg" alt="Friend" class="avatar">
-              <div class="friend-name">Saif</div>
             </div>
           </div>
 
@@ -312,7 +331,7 @@
     slides.forEach(slide => observer.observe(slide));
 
 
-    // 2. KEYBOARD NAVIGATION (UP/DOWN ARROWS)
+    // 2. KEYBOARD NAVIGATION
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault(); 
@@ -336,4 +355,3 @@
 
 </body>
 </html>
-
