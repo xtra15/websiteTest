@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#f8fafc">
-<title>GeoLab v2.3 (Fix)</title>
+<title>GeoLab DEV</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
     :root { 
@@ -52,6 +52,7 @@
     }
     .brand-title { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
     
+    /* DEV BADGE STYLE */
     .dev-badge {
         background: linear-gradient(135deg, #f59e0b, #d97706); 
         color: white; font-size: 0.6rem; font-weight: 700;
@@ -178,7 +179,7 @@
 
     <div id="loading-screen">
         <div class="spinner"></div>
-        <div class="loading-brand">GeoLab v2.3</div>
+        <div class="loading-brand">GeoLab DEV</div>
         <script>setTimeout(()=>{var s=document.getElementById('loading-screen');if(s){s.style.opacity='0';setTimeout(()=>{if(s)s.style.display='none';},500);}},1200);</script>
     </div>
 
@@ -195,6 +196,187 @@
         <div class="setting-card">
             <div class="card-label" style="color:#f59e0b;">Developer</div>
             <div class="row">
+                <span>Show Hitboxes</span>
+                <label class="switch"><input type="checkbox" id="opt-show-hitboxes" onchange="updateSettings()"><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="card-label" style="color:#ef4444;">Physics Engine</div>
+            <div class="row">
+                <span>Reflex Angles (>180°)</span>
+                <label class="switch"><input type="checkbox" id="opt-reflex" onchange="updateSettings()"><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="card-label">Controls</div>
+            <div class="row">
+                <span>Snap Rotation</span>
+                <label class="switch"><input type="checkbox" id="opt-snap-active" onchange="updateSettings()"><span class="slider"></span></label>
+            </div>
+            <div class="row">
+                <span>Step Angle</span>
+                <input type="number" id="opt-snap-val" value="5" min="1" max="360" onchange="updateSettings()">
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="card-label">Workspace</div>
+            <div class="row">
+                <span>Angle Labels</span>
+                <label class="switch"><input type="checkbox" id="opt-always-show" onchange="updateSettings()"><span class="slider"></span></label>
+            </div>
+            <div class="row">
+                <span>Background Grid</span>
+                <label class="switch"><input type="checkbox" id="opt-show-grid" onchange="updateSettings()"><span class="slider"></span></label>
+            </div>
+            <div style="height:1px; background:#e2e8f0; margin:5px 0;"></div>
+            <div class="row" style="font-size:0.85rem;">
+                <span>Text Size: <strong id="lbl-text-scale" style="color:var(--primary)">1.0x</strong></span>
+            </div>
+            <input type="range" id="opt-text-scale" min="0.5" max="1.5" step="0.1" value="1.0" oninput="updateSettings()">
+            <div class="row" style="font-size:0.85rem; margin-top:5px;">
+                <span>Protractors: <strong id="lbl-count" style="color:var(--primary)">8</strong></span>
+            </div>
+            <input type="range" id="opt-count" min="4" max="10" step="1" oninput="updateSettings()">
+        </div>
+
+        <div class="setting-card">
+            <div class="card-label">Color Scheme</div>
+            <div class="theme-grid">
+                <div class="theme-btn" id="theme-default" onclick="selectTheme('default')"><div class="theme-dot" style="background:#0f172a"></div>Apple</div>
+                <div class="theme-btn" id="theme-blueprint" onclick="selectTheme('blueprint')"><div class="theme-dot" style="background:#1e3a8a"></div>Print</div>
+                <div class="theme-btn" id="theme-midnight" onclick="selectTheme('midnight')"><div class="theme-dot" style="background:#000000"></div>OLED</div>
+                <div class="theme-btn" id="theme-candy" onclick="selectTheme('candy')"><div class="theme-dot" style="background:#ec4899"></div>Candy</div>
+                <div class="theme-btn" id="theme-royal" onclick="selectTheme('royal')"><div class="theme-dot" style="background:#4338ca"></div>Royal</div>
+                <div class="theme-btn" id="theme-forest" onclick="selectTheme('forest')"><div class="theme-dot" style="background:#059669"></div>Sage</div>
+                <div class="theme-btn" id="theme-paper" onclick="selectTheme('paper')"><div class="theme-dot" style="background:#a8a29e"></div>Paper</div>
+                <div class="theme-btn" id="theme-matrix" onclick="selectTheme('matrix')"><div class="theme-dot" style="background:#22c55e"></div>Matrix</div>
+            </div>
+        </div>
+        
+        <button style="background:#fee2e2; color:#b91c1c; width:100%; padding:14px; border:none; border-radius:16px; font-weight:700; font-size:0.9rem;" onclick="resetSettings()">Reset to Factory</button>
+    </div>
+
+    <header>
+        <div class="brand-container">
+            <div class="brand-title">GeoLab <span class="dev-badge">DEV</span></div>
+            <div class="brand-status" id="status-text"><div class="dot"></div> Active</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-icon-only" onclick="toggleDebug()" title="Debug">🐞</button>
+            <button class="btn-icon-only" onclick="toggleSettings()">⚙️</button>
+        </div>
+    </header>
+    
+    <div id="canvas-container"><canvas id="geoCanvas"></canvas></div>
+    
+    <div id="controls">
+        <button class="control-btn btn-ghost" onclick="clearStrings()">Clear</button>
+        <button class="control-btn btn-primary" onclick="resetBoard()">Reset</button>
+        <button class="control-btn btn-magic" onclick="autoAlign()">✨ Align</button>
+    </div>
+
+    <div class="toast" id="toast">Action Saved</div>
+
+<script>
+    // --- HELPER ---
+    function getCheck(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+    function getVal(id) { const el = document.getElementById(id); return el ? el.value : ""; }
+    function showToast(msg) { 
+        const t = document.getElementById('toast'); 
+        t.innerText = msg; t.classList.add('show'); 
+        setTimeout(() => t.classList.remove('show'), 2000); 
+    }
+
+    const canvas = document.getElementById('geoCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // --- DEBUG ENGINE ---
+    let debugMode = false;
+    let lastTime = 0, frameCount = 0, fps = 0, ptrX=0, ptrY=0, renderTime=0;
+    let logBuffer = [];
+    let inspectedObj = null;
+
+    function toggleDebug() {
+        debugMode = !debugMode;
+        document.getElementById('debug-console').style.display = debugMode ? 'block' : 'none';
+        if(debugMode) draw();
+    }
+
+    function log(msg) {
+        if(!debugMode) return;
+        const time = new Date().toLocaleTimeString('en-US', {hour12: false});
+        logBuffer.push(`[${time}] ${msg}`);
+        if(logBuffer.length > 4) logBuffer.shift();
+    }
+
+    function updateDebugLog() {
+        if(!debugMode) return;
+        const now = performance.now(); frameCount++;
+        if(now - lastTime >= 1000) { fps = frameCount; frameCount=0; lastTime=now; }
+        
+        let inspectHtml = '<span style="color:#666">Click obj to inspect</span>';
+        if(inspectedObj) {
+            let deg = (inspectedObj.angle * (180/Math.PI)).toFixed(1);
+            inspectHtml = `
+            <div class="log-line">ID: <span class="log-highlight">${inspectedObj.id}</span></div>
+            <div class="log-line">Angle: <span class="log-highlight">${deg}°</span></div>
+            <div class="log-line">Rad: <span class="log-highlight">${inspectedObj.angle.toFixed(3)}</span></div>
+            `;
+        }
+
+        let html = `
+<div class="log-header">SYSTEM MONITOR</div>
+<div class="log-line">FPS: <span class="log-highlight">${fps}</span></div>
+<div class="log-line">Render: <span class="log-highlight">${renderTime.toFixed(2)}ms</span></div>
+<div class="log-line">Pointer: <span class="log-highlight">${Math.round(ptrX)},${Math.round(ptrY)}</span></div>
+<div class="log-section">INSPECTOR</div>
+${inspectHtml}
+<div class="log-section">EVENT LOG</div>
+`;
+        logBuffer.forEach(l => { html += `<div style="color:#0f0; font-size:9px;">${l}</div>`; });
+        document.getElementById('debug-console').innerHTML = html;
+    }
+
+    const THEMES = {
+        'default': { bg: '#ffffff', line: '#3b82f6', tick: '#64748b', text: '#334155', bodyBg: '#f8fafc', pin: '#fbbf24', labelBg: '#ffffff', labelTxt: '#2563eb' },
+        'blueprint': { bg: '#1e3a8a', line: '#ffffff', tick: '#ffffff', text: '#e0f2fe', bodyBg: '#172554', pin: '#60a5fa', labelBg: '#172554', labelTxt: '#ffffff' },
+        'midnight': { bg: '#000000', line: '#38bdf8', tick: '#94a3b8', text: '#e2e8f0', bodyBg: '#0f172a', pin: '#0ea5e9', labelBg: '#1e293b', labelTxt: '#38bdf8' },
+        'paper': { bg: '#fffbf0', line: '#57534e', tick: '#78716c', text: '#44403c', bodyBg: '#f5f5f4', pin: '#d97706', labelBg: '#f5f5f4', labelTxt: '#44403c' },
+        'matrix': { bg: '#022c22', line: '#22c55e', tick: '#4ade80', text: '#4ade80', bodyBg: '#000000', pin: '#ffffff', labelBg: '#000000', labelTxt: '#22c55e' },
+        'candy': { bg: '#fff1f2', line: '#db2777', tick: '#be185d', text: '#9d174d', bodyBg: '#fdf2f8', pin: '#f472b6', labelBg: '#ffffff', labelTxt: '#be185d' },
+        'royal': { bg: '#312e81', line: '#fbbf24', tick: '#e0e7ff', text: '#fef3c7', bodyBg: '#1e1b4b', pin: '#f59e0b', labelBg: '#1e1b4b', labelTxt: '#fbbf24' },
+        'forest': { bg: '#ecfdf5', line: '#059669', tick: '#047857', text: '#064e3b', bodyBg: '#d1fae5', pin: '#10b981', labelBg: '#ffffff', labelTxt: '#059669' }
+    };
+
+    const DEFAULTS = { 
+        alwaysShowAngles: true, showGrid: true, snapRotation: false, snapIncrement: 5, 
+        strictPhysics: true, protractorCount: 8, currentTheme: 'default', textScale: 1.0, showHitboxes: false 
+    };
+    
+    let appSettings = {...DEFAULTS};
+    try {
+        const stored = JSON.parse(localStorage.getItem('geoSettings'));
+        if (stored) {
+            appSettings = {...DEFAULTS, ...stored};
+            if (!THEMES[appSettings.currentTheme]) appSettings.currentTheme = 'default';
+        }
+    } catch(e) { appSettings = {...DEFAULTS}; }
+
+    let NUM_PROTRACTORS = appSettings.protractorCount;
+    const CENTER_ID = 999; 
+    let boardRadius, protractorRadius, centerProtractorRadius;
+    let width, height, centerX, centerY;
+    let protractors = [], strings = [];
+    let draggingProtractor = null, dragOffsetAngle = 0, activeStringStartID = null, hoveredPinID = null;
+
+    function initUI() {
+        try {
+            document.getElementById('opt-always-show').checked = appSettings.alwaysShowAngles;
+            document.getElementById('opt-show-grid').checked = appSettings.showGrid;
+             <div class="row">
                 <span>Show Hitboxes</span>
                 <label class="switch"><input type="checkbox" id="opt-show-hitboxes" onchange="updateSettings()"><span class="slider"></span></label>
             </div>
@@ -801,6 +983,7 @@ ${inspectHtml}
 
 </body>
 </html>
+
 
 
 
