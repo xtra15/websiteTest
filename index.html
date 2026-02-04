@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#ffffff">
-<title>GeoLab v9.2 Ultimate</title>
+<title>GeoLab v9.6 Ultimate</title>
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <style>
     :root {
@@ -17,7 +17,7 @@
         --primary: #3b82f6;
         --danger: #ef4444;
         --btn-bg: rgba(0,0,0,0.05);
-        --btn-text: #0f172a; /* New variable for button text contrast */
+        --btn-text: #0f172a;
         --font-ui: 'Inter', sans-serif;
         --radius: 24px;
         --shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
@@ -67,55 +67,67 @@
         transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* HEADER */
+    /* --- HEADER (FIXED UI) --- */
     header { 
-        position: absolute; top: 20px; width: 92%; max-width: 600px;
+        position: absolute; top: 16px; 
+        width: 96%; /* Wider to prevent overflow */
+        max-width: 500px; /* Capped width */
         display: flex; justify-content: space-between; align-items: center;
-        padding: 8px 12px 8px 20px; box-sizing: border-box;
-        border-radius: 24px; z-index: 100;
+        padding: 6px 10px 6px 16px; /* Tighter padding */
+        box-sizing: border-box;
+        border-radius: 20px; z-index: 100;
+        height: 54px; /* Fixed height to keep it neat */
     }
-    .brand-title { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
-    .dev-badge { background: var(--primary); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 4px 10px; border-radius: 12px; }
+    .brand-title { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 6px; }
+    .dev-badge { background: var(--primary); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
     
-    .header-actions { display: flex; gap: 8px; }
+    .header-actions { display: flex; gap: 6px; }
     .btn-icon-only {
-        width: 42px; height: 42px; border-radius: 14px;
+        width: 38px; height: 38px; /* Smaller header buttons */
+        border-radius: 12px;
         background: var(--btn-bg); border: none; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
-        font-size: 1.1rem; transition: all 0.2s; color: var(--text);
+        font-size: 1rem; transition: all 0.2s; color: var(--text);
         border: 1px solid var(--border);
     }
     .btn-icon-only:active { transform: scale(0.92); opacity: 0.8; }
-    .btn-help { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border:none; }
+    .btn-filled { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border:none; }
 
-    /* VERTICAL TOOLBAR */
+    /* SLIDING VERTICAL TOOLBAR */
     #toolbar {
-        position: absolute; top: 50%; left: 16px; transform: translateY(-50%);
-        padding: 8px; border-radius: 24px; 
-        display: flex; flex-direction: column; gap: 12px;
+        position: absolute; top: 50%; left: 16px; 
+        transform: translate(-200%, -50%); 
+        padding: 6px; border-radius: 20px; 
+        display: flex; flex-direction: column; gap: 8px;
         z-index: 90; width: auto;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    #toolbar.active {
+        transform: translate(0, -50%);
+    }
+
     .tool-opt {
-        padding: 12px 6px; border-radius: 16px; color: var(--text);
-        font-weight: 700; font-size: 0.65rem; cursor: pointer;
-        transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; 
-        opacity: 0.6; width: 56px;
+        padding: 8px 4px; border-radius: 14px; color: var(--text);
+        font-weight: 700; font-size: 0.55rem;
+        cursor: pointer;
+        transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; 
+        opacity: 0.6; width: 44px;
         position: relative; overflow: visible;
     }
-    .tool-icon { font-size: 1.4rem; }
+    .tool-icon { font-size: 1.2rem; }
+    
     .tool-opt:hover { opacity: 0.9; }
-    /* FIXED: Selected tool uses generic white text for contrast on primary color */
     .tool-opt.selected { background: var(--primary); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: scale(1.05); }
 
-    /* DISABLED TANGENT TOOL */
     .tool-opt.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(100%); }
     .tool-opt.disabled:active { transform: none; }
-    .lock-badge { position: absolute; top: -6px; right: -6px; font-size: 0.9rem; z-index: 10; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+    .lock-badge { position: absolute; top: -4px; right: -4px; font-size: 0.8rem; z-index: 10; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+    
     .tool-opt.disabled:hover::after {
         content: "Disabled"; position: absolute; left: 110%; top: 50%; transform: translateY(-50%);
-        background: var(--text); color: var(--bg); padding: 6px 12px; border-radius: 8px; 
-        font-size: 0.75rem; font-weight: 700; white-space: nowrap; pointer-events: none;
-        animation: fadeIn 0.2s ease; border: 1px solid var(--danger);
+        background: var(--text); color: var(--bg); padding: 4px 8px; border-radius: 6px; 
+        font-size: 0.65rem; font-weight: 700; white-space: nowrap; pointer-events: none;
+        animation: fadeIn 0.2s ease; border: 1px solid var(--danger); z-index: 99;
     }
     @keyframes fadeIn { from { opacity: 0; transform: translate(-10px, -50%); } to { opacity: 1; transform: translate(0, -50%); } }
 
@@ -129,18 +141,20 @@
     }
     canvas { display: block; touch-action: none; }
 
-    /* CONTROLS */
+    /* --- CONTROLS (REVAMPED) --- */
     #controls {
-        position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 50;
-        display: flex; gap: 12px; padding: 8px; border-radius: 24px;
+        position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 50;
+        display: flex; gap: 8px; padding: 6px; 
+        border-radius: 20px; /* Tighter container */
     }
     .control-btn {
-        border: none; padding: 14px 24px; border-radius: 16px;
-        font-weight: 700; font-size: 0.9rem; cursor: pointer;
-        display: flex; align-items: center; gap: 8px; transition: transform 0.1s;
+        border: none; 
+        padding: 10px 18px; /* Reduced Size */
+        border-radius: 14px; /* "Not that capsule" (Squircle) */
+        font-weight: 700; font-size: 0.8rem; cursor: pointer;
+        display: flex; align-items: center; gap: 6px; transition: transform 0.1s;
     }
     .btn-ghost { background: var(--btn-bg); color: var(--text); border: 1px solid var(--border); }
-    /* FIXED: Primary buttons now use --btn-text for contrast safety */
     .btn-primary { background: var(--text); color: var(--bg); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     .btn-magic { background: var(--primary); color: #fff; box-shadow: 0 8px 20px -5px rgba(0,0,0,0.2); }
     .control-btn:active { transform: scale(0.95); }
@@ -276,7 +290,7 @@
 
     <div id="loading-screen">
         <div class="spinner"></div>
-        <div class="loading-brand">GeoLab v9.1</div>
+        <div class="loading-brand">GeoLab v9.6</div>
     </div>
 
     <div id="confirm-modal" class="custom-popup glass-panel">
@@ -296,8 +310,9 @@
     </div>
 
     <header class="glass-panel">
-        <div class="brand-title">GeoLab <span class="dev-badge">v9.2</span></div>
+        <div class="brand-title">GeoLab <span class="dev-badge">v9.6</span></div>
         <div class="header-actions">
+            <button class="btn-icon-only btn-filled" onclick="toggleToolbar()">🛠️</button>
             <button class="btn-icon-only btn-help" onclick="toggleHelp()">?</button>
             <button class="btn-icon-only" onclick="togglePointsModal()">📋</button>
             <button class="btn-icon-only" onclick="toggleDebug()">🐞</button>
@@ -309,7 +324,6 @@
         <div class="tool-opt selected" id="tool-drag" onclick="setTool('drag')"><span class="tool-icon">✋</span>Drag</div>
         <div class="tool-opt" id="tool-connect" onclick="setTool('connect')"><span class="tool-icon">🔗</span>Link</div>
         <div class="tool-opt" id="tool-point" onclick="setTool('point')"><span class="tool-icon">🔵</span>Point</div>
-        
         <div class="tool-opt disabled" id="tool-tangent" onclick="setTool('tangent')">
             <div class="lock-badge">🔒</div>
             <span class="tool-icon">📐</span>Tan
@@ -404,46 +418,32 @@
     // --- THEME ENGINE ---
     const THEMES = {
         'modern': { 
-            // ICE BLUE REVAMP (Fixed Visibility)
             bg: '#f0f9ff', transparentCanvas: false, c_bg: '#f0f9ff', 
             surface: 'rgba(255, 255, 255, 0.95)', 
-            text: '#0c4a6e', // Dark Navy Text
-            primary: '#0ea5e9', // Sky Blue
-            border: 'rgba(14, 165, 233, 0.2)', 
-            btn_bg: 'rgba(255,255,255,0.6)',
-            btn_text: '#0f172a',
+            text: '#0c4a6e', primary: '#0ea5e9', border: 'rgba(14, 165, 233, 0.2)', 
+            btn_bg: 'rgba(255,255,255,0.6)', btn_text: '#0f172a',
             c_grid: '#e0f2fe', c_line: '#0284c7', c_text: '#0c4a6e', c_pin: '#0ea5e9', 
             font: "'Inter', sans-serif", blur:'24px' 
         },
-        
-        // TRUE LIQUID GLASS (High Contrast Molten Mesh)
         'liquid': { 
             bg: 'radial-gradient(at 0% 0%, hsla(280,100%,20%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(240,100%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(320,100%,30%,1) 0, transparent 50%), radial-gradient(at 0% 50%, hsla(340,100%,30%,1) 0, transparent 50%), radial-gradient(at 100% 50%, hsla(260,100%,20%,1) 0, transparent 50%), #0f0c29', 
-            transparentCanvas: true, 
-            c_bg: 'rgba(255, 255, 255, 0)', 
-            surface: 'rgba(0, 0, 0, 0.4)', // Darker glass for better white text
-            text: '#ffffff', 
-            primary: '#00d2ff', border: 'rgba(255, 255, 255, 0.3)', 
-            btn_bg: 'rgba(255,255,255,0.1)', 
-            btn_text: '#ffffff',
+            transparentCanvas: true, c_bg: 'rgba(255, 255, 255, 0)', surface: 'rgba(0, 0, 0, 0.4)', 
+            text: '#ffffff', primary: '#00d2ff', border: 'rgba(255, 255, 255, 0.3)', 
+            btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff',
             c_grid: 'rgba(255, 255, 255, 0.1)', c_line: '#00d2ff', c_text: '#ffffff', c_pin: '#00d2ff', 
             font: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", blur:'30px'
         },
-
         'midnight': { 
             bg: '#020617', transparentCanvas: false, c_bg: '#020617', 
             surface: 'rgba(15, 23, 42, 0.95)', text: '#f1f5f9', primary: '#38bdf8', 
-            border: 'rgba(255,255,255,0.15)', btn_bg: 'rgba(255,255,255,0.1)',
-            btn_text: '#ffffff',
+            border: 'rgba(255,255,255,0.15)', btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff',
             c_grid: '#1e293b', c_line: '#38bdf8', c_text: '#e2e8f0', c_pin: '#0ea5e9', 
             font: "'Inter', sans-serif", blur:'24px' 
         },
         'blueprint': { 
-            // Fixed Contrast Blue
             bg: '#172554', transparentCanvas: false, c_bg: '#172554', 
             surface: 'rgba(30, 58, 138, 0.95)', text: '#dbeafe', primary: '#60a5fa', 
-            border: 'rgba(255,255,255,0.2)', btn_bg: 'rgba(255,255,255,0.1)', 
-            btn_text: '#ffffff',
+            border: 'rgba(255,255,255,0.2)', btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff',
             c_grid: 'rgba(255,255,255,0.1)', c_line: '#93c5fd', c_text: '#dbeafe', c_pin: '#3b82f6', 
             font: "'Space Grotesk', sans-serif", blur:'24px' 
         },
@@ -500,6 +500,8 @@
     function toggleAccordion(header) { const item = header.parentElement; item.classList.toggle('open'); }
     function toggleDebug() { debugMode = !debugMode; document.getElementById('debug-hud').style.display = debugMode ? 'block' : 'none'; draw(); }
     
+    function toggleToolbar() { document.getElementById('toolbar').classList.toggle('active'); }
+
     function closeAllModals() {
         document.querySelectorAll('.bottom-sheet').forEach(el => el.classList.remove('active'));
         document.getElementById('overlay').classList.remove('active');
@@ -511,7 +513,7 @@
     function togglePointsModal() { renderPointList(); openModal('points-modal'); }
 
     function setTool(t) {
-        if (t === 'tangent') return; // DISABLED
+        if (t === 'tangent') return;
         currentTool = t;
         document.querySelectorAll('.tool-opt').forEach(el => el.classList.remove('selected'));
         document.getElementById('tool-'+t).classList.add('selected');
@@ -641,17 +643,9 @@
             if (appSettings.showRing) {
                 ctx.save(); ctx.translate(this.pivotX, this.pivotY); ctx.rotate(this.angle); 
                 ctx.beginPath(); ctx.arc(0, 0, this.r, 0, Math.PI, false); ctx.closePath();
-                
-                // Canvas gradient based on solid colors
                 const g = ctx.createLinearGradient(0, -this.r, 0, 0); 
-                if (t.transparentCanvas) {
-                    g.addColorStop(0, 'rgba(255,255,255,0.1)'); // Subtle glass for ring
-                    g.addColorStop(1, 'rgba(255,255,255,0.4)');
-                } else {
-                    g.addColorStop(0, t.c_bg); 
-                    g.addColorStop(1, t.surface); 
-                }
-                
+                if (t.transparentCanvas) { g.addColorStop(0, 'rgba(255,255,255,0.1)'); g.addColorStop(1, 'rgba(255,255,255,0.4)'); } 
+                else { g.addColorStop(0, t.c_bg); g.addColorStop(1, t.surface); }
                 ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = t.c_line; ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(-this.r, 0); ctx.lineTo(this.r, 0); ctx.stroke(); 
                 this.drawScale(ctx, this.r, t); ctx.restore(); 
@@ -792,7 +786,6 @@
         if (!THEMES[appSettings.currentTheme]) appSettings.currentTheme = 'modern';
         const t = THEMES[appSettings.currentTheme]; 
         
-        // IMPORTANT: Clear entire canvas. For transparent themes, this reveals the body background.
         ctx.clearRect(0,0,width,height); 
         
         if(appSettings.showGrid) {
@@ -839,7 +832,11 @@
         const p = getPointer(e); lastPos=p; ptrX=p.x; ptrY=p.y; 
         let idHit = getIDAt(p.x, p.y);
         let circleHitID = checkCircleHit(p.x, p.y);
-        if (currentTool === 'point') { const label = String.fromCharCode(65 + (freePoints.length % 26)); freePoints.push({id: uniquePointID++, x: p.x, y: p.y, locked: false, label: label}); draw(); showToast("Point Created"); return; }
+        if (currentTool === 'point') { 
+            const label = String.fromCharCode(65 + (freePoints.length % 26)); 
+            freePoints.push({id: uniquePointID++, x: p.x, y: p.y, locked: false, label: label}); 
+            draw(); showToast("Point Created"); return; 
+        }
         if (currentTool === 'drag') {
             if (idHit !== null && idHit >= 2000) {
                 const point = freePoints.find(fp => fp.id === idHit);
@@ -875,15 +872,59 @@
             const end = getIDAt(lastPos.x, lastPos.y); 
             if(end!==null && end!==activeStringStartID) { 
                 const exists = strings.some(s=>(s.start===activeStringStartID && s.end===end)||(s.start===end && s.end===activeStringStartID)); 
-                if(!exists) { strings.push({start:activeStringStartID, end:end}); showToast("Connected"); } 
+                if(!exists) { 
+                    strings.push({start:activeStringStartID, end:end}); 
+                    showToast("Connected");
+                    
+                    // --- NEW LOGIC: AUTO-ALIGN HIDDEN RINGS ONLY ---
+                    if (!appSettings.showRing) {
+                        [activeStringStartID, end].forEach(pid => {
+                            if (pid < 100 && pid !== CENTER_ID) { // Check if it is a protractor
+                                const p = protractors[pid];
+                                const angs = getAllConnectedAngles(p.id);
+                                if (angs.length > 0) {
+                                    if (angs.length === 1) p.angle = angs[0];
+                                    else {
+                                        let maxG = 0, best = angs[0];
+                                        for (let i=0; i<angs.length; i++) {
+                                            let g = angs[(i+1)%angs.length] - angs[i];
+                                            if(g<0) g+=Math.PI*2;
+                                            if(g>maxG) { maxG=g; best=angs[(i+1)%angs.length]; }
+                                        }
+                                        p.angle = best;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    // --- END NEW LOGIC ---
+                } 
             } 
             activeStringStartID=null; draw(); 
         } 
         draggingProtractor=null; draggingPoint=null;
     });
-    canvas.addEventListener('touchstart', e => { canvas.dispatchEvent(new MouseEvent('mousedown', e.touches[0])); }, {passive:false});
-    canvas.addEventListener('touchmove', e => { canvas.dispatchEvent(new MouseEvent('mousemove', e.touches[0])); }, {passive:false});
-    window.addEventListener('touchend', e => { window.dispatchEvent(new MouseEvent('mouseup', {})); });
+
+    // --- FIX FOR DOUBLE POINT CREATION ---
+    // We prevent default on touchstart to stop the browser from firing a backup 'mousedown'
+    canvas.addEventListener('touchstart', e => { 
+        if(e.cancelable) e.preventDefault(); 
+        const touch = e.touches[0];
+        const me = new MouseEvent('mousedown', { clientX: touch.clientX, clientY: touch.clientY, bubbles: true });
+        canvas.dispatchEvent(me); 
+    }, {passive:false});
+
+    canvas.addEventListener('touchmove', e => { 
+        if(e.cancelable) e.preventDefault(); 
+        const touch = e.touches[0];
+        const me = new MouseEvent('mousemove', { clientX: touch.clientX, clientY: touch.clientY, bubbles: true });
+        canvas.dispatchEvent(me); 
+    }, {passive:false});
+
+    window.addEventListener('touchend', e => { 
+        const me = new MouseEvent('mouseup', { bubbles: true });
+        window.dispatchEvent(me); 
+    });
 
     window.onload = function() { initUI(); resize(); setTimeout(() => { const s = document.getElementById('loading-screen'); if(s){s.style.opacity='0';setTimeout(()=>{s.style.display='none';},600);} }, 1000); }; 
     window.onresize = resize;
