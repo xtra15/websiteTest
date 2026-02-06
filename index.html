@@ -4,181 +4,233 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#ffffff">
-<title>GeoLab v9.6 Ultimate</title>
+<title>GeoLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <style>
     :root {
         /* Default Variables */
         --bg: #f8fafc;
-        --surface: rgba(255, 255, 255, 0.95);
-        --border: rgba(0, 0, 0, 0.08);
-        --text: #0f172a;
-        --primary: #3b82f6;
-        --danger: #ef4444;
-        --btn-bg: rgba(0,0,0,0.05);
-        --btn-text: #0f172a;
-        --font-ui: 'Inter', sans-serif;
-        --radius: 24px;
-        --shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
-        --glass-border: 1px solid rgba(255,255,255,0.6);
-        --panel-blur: 24px;
+        --surface: rgba(255, 255, 255, 0.5);
+        --border: rgba(255, 255, 255, 0.4);
+        --text: #1d1d1f;
+        --primary: #007aff;
+        --danger: #ff3b30;
+        --btn-bg: rgba(255,255,255,0.15);
+        --btn-text: #1d1d1f;
+        --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+        --radius: 32px;
+        --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+        --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+        --panel-blur: 50px;
+        --saturation: 180%;
+        --safe-top: env(safe-area-inset-top, 20px);
+        --safe-bottom: env(safe-area-inset-bottom, 20px);
+        
+        /* Dynamic Layout Vars */
+        --header-pos-top: max(12px, var(--safe-top));
+        --header-pos-bottom: auto;
+        --controls-pos-bottom: max(30px, var(--safe-bottom));
+        --controls-pos-top: auto;
+        --toolbar-left: 16px;
+        --toolbar-right: auto;
+        --toolbar-top: 50%;
+        --toolbar-transform: translate(-200%, -50%);
+        --toolbar-active-transform: translate(0, -50%);
+        --toolbar-direction: column;
     }
 
     body {
         margin: 0; display: flex; flex-direction: column; align-items: center;
         font-family: var(--font-ui);
-        background: var(--bg);
-        background-size: 300% 300%; 
-        animation: liquidFlow 20s ease infinite;
-        background-attachment: fixed;
+        background: var(--bg); background-size: 400% 400%; 
         color: var(--text);
         height: 100vh; width: 100vw; overflow: hidden;
         touch-action: none; user-select: none; -webkit-user-select: none;
-        transition: color 0.3s ease, background 0.3s ease;
+        transition: color 0.3s ease, background 0.5s ease;
     }
 
-    @keyframes liquidFlow {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+    /* LOW POWER MODE */
+    .low-power body { background-image: none !important; background-color: var(--bg); }
+    .low-power .glass-panel { backdrop-filter: none !important; background: var(--surface); opacity: 0.98; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .low-power .mesh-gradient { display: none; }
+    
+    /* LIQUID BACKGROUNDS */
+    .special-bg-layer { position: fixed; inset: -20%; width: 140%; height: 140%; z-index: -2; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; will-change: transform; }
+    .mesh-gradient {
+        background: radial-gradient(circle at 15% 50%, rgba(32, 126, 255, 0.8), transparent 25%), 
+                    radial-gradient(circle at 85% 30%, rgba(255, 50, 150, 0.8), transparent 25%), 
+                    radial-gradient(circle at 50% 80%, rgba(0, 255, 200, 0.8), transparent 40%);
+        background-color: #f0f4f8; filter: blur(60px); animation: meshFlow 20s ease-in-out infinite alternate;
+        transform: translateZ(0); 
     }
-
-    /* Loading Screen */
-    #loading-screen {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: var(--bg); z-index: 9999;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    .noise-overlay {
+        position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0; 
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         transition: opacity 0.5s ease;
     }
-    .spinner {
-        width: 48px; height: 48px; border: 4px solid rgba(0,0,0,0.1);
-        border-bottom-color: var(--primary); border-radius: 50%;
-        animation: rot 1s linear infinite; margin-bottom: 20px;
-    }
-    .loading-brand { font-weight: 800; font-size: 1.2rem; color: var(--text); }
-    @keyframes rot { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes meshFlow { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-20px, 20px) scale(1.05); } }
 
-    /* Glass Panels */
+    /* HOLOGRAPHIC LOADER */
+    #loading-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #ffffff; z-index: 9999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transition: opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1), transform 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+        will-change: opacity, transform;
+    }
+    .holo-container { position: relative; width: 100px; height: 100px; }
+    .holo-liquid {
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, #00c6ff, #007aff);
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        animation: morph 3s linear infinite alternate, spin 4s linear infinite;
+        filter: blur(10px); opacity: 0.8;
+    }
+    .holo-ring {
+        position: absolute; inset: -20px; border: 1px solid rgba(0, 122, 255, 0.3);
+        border-radius: 50%; border-top-color: #007aff;
+        animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    }
+    .holo-core {
+        position: absolute; inset: 10px; background: #fff; border-radius: 50%; z-index: 2;
+        display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,122,255,0.2);
+    }
+    .loading-text {
+        margin-top: 40px; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.5rem;
+        background: linear-gradient(90deg, #007aff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        opacity: 0; animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+    @keyframes morph { 0% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; } 100% { border-radius: 40% 60%; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* LIQUID PANELS */
     .glass-panel {
-        background: var(--surface); 
-        backdrop-filter: blur(var(--panel-blur)); -webkit-backdrop-filter: blur(var(--panel-blur));
-        border: var(--glass-border); box-shadow: var(--shadow);
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.5);
         transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* --- HEADER (FIXED UI) --- */
+    /* HEADER */
     header { 
-        position: absolute; top: 16px; 
-        width: 96%; /* Wider to prevent overflow */
-        max-width: 500px; /* Capped width */
+        position: absolute; 
+        top: var(--header-pos-top); 
+        bottom: var(--header-pos-bottom);
+        width: 95%; max-width: 600px;
         display: flex; justify-content: space-between; align-items: center;
-        padding: 6px 10px 6px 16px; /* Tighter padding */
-        box-sizing: border-box;
-        border-radius: 20px; z-index: 100;
-        height: 54px; /* Fixed height to keep it neat */
+        padding: 8px 12px 8px 24px; box-sizing: border-box; border-radius: 40px; z-index: 100; height: 68px;
     }
-    .brand-title { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 6px; }
-    .dev-badge { background: var(--primary); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+    .brand-title { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+    .dev-badge { background: rgba(0,122,255,0.1); color: #007aff; font-size: 0.6rem; font-weight: 700; padding: 4px 8px; border-radius: 12px; }
+    .header-actions { display: flex; gap: 8px; }
     
-    .header-actions { display: flex; gap: 6px; }
+    /* LIQUID BUTTONS */
     .btn-icon-only {
-        width: 38px; height: 38px; /* Smaller header buttons */
-        border-radius: 12px;
-        background: var(--btn-bg); border: none; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1rem; transition: all 0.2s; color: var(--text);
-        border: 1px solid var(--border);
+        width: 44px; height: 44px; border-radius: 50%; 
+        background: rgba(255, 255, 255, 0.1); 
+        border: 1px solid rgba(255, 255, 255, 0.5); 
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); color: var(--text);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -2px 5px rgba(0,0,0,0.05), 0 5px 15px rgba(0, 0, 0, 0.08);
     }
-    .btn-icon-only:active { transform: scale(0.92); opacity: 0.8; }
-    .btn-filled { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border:none; }
+    .btn-icon-only:hover {
+        background: rgba(255, 255, 255, 0.25); transform: translateY(-2px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    .btn-icon-only:active { 
+        transform: scale(0.92) translateY(0); box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); background: rgba(255, 255, 255, 0.1);
+    }
+    .btn-filled { 
+        background: linear-gradient(135deg, var(--primary), #00c6ff); color: #fff; border:none; 
+        box-shadow: 0 8px 20px rgba(0,122,255,0.3), inset 0 1px 0 rgba(255,255,255,0.4); 
+    }
 
-    /* SLIDING VERTICAL TOOLBAR */
+    /* TOOLBAR */
     #toolbar {
-        position: absolute; top: 50%; left: 16px; 
-        transform: translate(-200%, -50%); 
-        padding: 6px; border-radius: 20px; 
-        display: flex; flex-direction: column; gap: 8px;
-        z-index: 90; width: auto;
-        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: absolute; 
+        top: var(--toolbar-top); left: var(--toolbar-left); right: var(--toolbar-right);
+        transform: var(--toolbar-transform); 
+        padding: 10px; border-radius: 32px; 
+        display: flex; flex-direction: var(--toolbar-direction); gap: 12px;
+        z-index: 90; width: auto; 
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-height: 70vh; overflow-y: auto; overflow-x: hidden;
+        margin-top: 0; margin-bottom: 0;
     }
-    #toolbar.active {
-        transform: translate(0, -50%);
-    }
+    #toolbar.active { transform: var(--toolbar-active-transform); }
 
     .tool-opt {
-        padding: 8px 4px; border-radius: 14px; color: var(--text);
-        font-weight: 700; font-size: 0.55rem;
-        cursor: pointer;
-        transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; 
-        opacity: 0.6; width: 44px;
-        position: relative; overflow: visible;
+        padding: 10px 4px; border-radius: 20px; color: var(--text); font-weight: 600; font-size: 0.65rem;
+        cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; 
+        opacity: 0.6; width: 56px; position: relative; overflow: visible;
     }
-    .tool-icon { font-size: 1.2rem; }
-    
-    .tool-opt:hover { opacity: 0.9; }
-    .tool-opt.selected { background: var(--primary); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: scale(1.05); }
-
-    .tool-opt.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(100%); }
-    .tool-opt.disabled:active { transform: none; }
-    .lock-badge { position: absolute; top: -4px; right: -4px; font-size: 0.8rem; z-index: 10; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
-    
-    .tool-opt.disabled:hover::after {
-        content: "Disabled"; position: absolute; left: 110%; top: 50%; transform: translateY(-50%);
-        background: var(--text); color: var(--bg); padding: 4px 8px; border-radius: 6px; 
-        font-size: 0.65rem; font-weight: 700; white-space: nowrap; pointer-events: none;
-        animation: fadeIn 0.2s ease; border: 1px solid var(--danger); z-index: 99;
+    .tool-icon { font-size: 1.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); margin-bottom: 2px; }
+    .tool-opt:hover { opacity: 1; transform: scale(1.05); }
+    .tool-opt.selected { 
+        background: rgba(255,255,255,0.65); color: var(--primary); opacity: 1; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9); 
+        transform: scale(1.1); border: 1px solid rgba(255,255,255,0.6); backdrop-filter: blur(10px);
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translate(-10px, -50%); } to { opacity: 1; transform: translate(0, -50%); } }
-
+    .tool-opt.disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); }
+    
     /* CANVAS */
     #canvas-container {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        border-radius: 40px; 
-        background: transparent;
-        box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.15);
-        touch-action: none; overflow: hidden; border: 6px solid var(--surface);
+        border-radius: 50px; background: transparent; box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15);
+        touch-action: none; overflow: hidden; border: 2px solid rgba(255,255,255,0.1);
     }
     canvas { display: block; touch-action: none; }
 
-    /* --- CONTROLS (REVAMPED) --- */
+    /* CONTROLS */
     #controls {
-        position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 50;
-        display: flex; gap: 8px; padding: 6px; 
-        border-radius: 20px; /* Tighter container */
+        position: absolute; bottom: var(--controls-pos-bottom); top: var(--controls-pos-top); 
+        left: 50%; transform: translateX(-50%); z-index: 50;
+        display: flex; gap: 12px; padding: 10px; border-radius: 36px; width: auto; justify-content: center;
     }
+    
     .control-btn {
-        border: none; 
-        padding: 10px 18px; /* Reduced Size */
-        border-radius: 14px; /* "Not that capsule" (Squircle) */
-        font-weight: 700; font-size: 0.8rem; cursor: pointer;
-        display: flex; align-items: center; gap: 6px; transition: transform 0.1s;
+        border: 1px solid rgba(255,255,255,0.5); padding: 14px 28px; border-radius: 24px; 
+        font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; 
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        background: rgba(255,255,255,0.2); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -2px 10px rgba(255,255,255,0.1), 0 10px 30px rgba(0,0,0,0.1);
     }
-    .btn-ghost { background: var(--btn-bg); color: var(--text); border: 1px solid var(--border); }
-    .btn-primary { background: var(--text); color: var(--bg); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .btn-magic { background: var(--primary); color: #fff; box-shadow: 0 8px 20px -5px rgba(0,0,0,0.2); }
-    .control-btn:active { transform: scale(0.95); }
+    .btn-ghost { color: var(--text); }
+    .btn-primary { background: rgba(255,255,255,0.4); color: var(--text); border: 1px solid var(--primary); } 
+    .btn-magic { 
+        background: linear-gradient(135deg, rgba(0,122,255,0.8), rgba(0,198,255,0.8)); color: #fff; border: 1px solid rgba(255,255,255,0.3);
+        box-shadow: 0 10px 30px rgba(0,122,255,0.4), inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 20px rgba(0,122,255,0.5);
+    }
+    .control-btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: inset 0 1px 0 rgba(255,255,255,1), 0 15px 40px rgba(0,0,0,0.15); background: rgba(255,255,255,0.3); }
+    .btn-magic:hover { background: linear-gradient(135deg, rgba(0,122,255,0.9), rgba(0,198,255,0.9)); }
+    .control-btn:active { transform: scale(0.95); box-shadow: inset 0 2px 10px rgba(0,0,0,0.1); background: rgba(255,255,255,0.1); }
 
-    /* POPUP CONFIRMATION */
+    /* POPUP */
     .custom-popup {
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
-        background: var(--surface); padding: 24px; border-radius: 24px;
-        width: 85%; max-width: 320px; z-index: 300;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid var(--border);
+        background: var(--surface); backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%);
+        padding: 32px; border-radius: 40px; width: 80%; max-width: 320px; z-index: 300;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.2); border: 1px solid var(--border);
         text-align: center; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .custom-popup.active { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
-    .popup-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; color: var(--text); }
-    .popup-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; color: var(--text); }
-    .popup-actions { display: flex; gap: 10px; justify-content: center; }
-    .popup-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; }
-    .btn-cancel { background: rgba(0,0,0,0.1); color: var(--text); }
-    .btn-confirm { background: var(--danger); color: white; }
+    .popup-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; color: var(--text); letter-spacing: -0.5px; }
+    .popup-desc { font-size: 1rem; opacity: 0.7; margin-bottom: 32px; color: var(--text); line-height: 1.5; }
+    .popup-actions { display: flex; gap: 12px; justify-content: center; }
+    .popup-btn { flex: 1; padding: 16px; border-radius: 20px; font-weight: 700; border: none; cursor: pointer; font-size: 1rem; transition: all 0.2s; }
+    .btn-cancel { background: rgba(0,0,0,0.05); color: var(--text); }
+    .btn-confirm { background: var(--danger); color: white; box-shadow: 0 8px 20px rgba(255, 59, 48, 0.3); }
 
-    /* HUD */
+    /* DEBUG HUD */
     #debug-hud {
         position: fixed; top: 90px; right: 20px; width: 180px;
-        background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px);
+        background: rgba(0,0,0,0.7); backdrop-filter: blur(20px);
         border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
         padding: 15px; font-family: 'JetBrains Mono', monospace; font-size: 10px;
         color: #00ff9d; display: none; z-index: 500; pointer-events: none;
@@ -188,118 +240,105 @@
     /* MODAL SYSTEM */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 190; display: none;
-        opacity: 0; transition: opacity 0.3s;
+        background: rgba(0,0,0,0.2); backdrop-filter: blur(8px); z-index: 190; display: none; opacity: 0; transition: opacity 0.3s;
     }
     .modal-overlay.active { display: block; opacity: 1; }
     
     .bottom-sheet {
-        position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
-        width: 94%; max-width: 500px; background: var(--surface);
-        border-top-left-radius: 32px; border-top-right-radius: 32px;
-        box-shadow: 0 -20px 60px rgba(0,0,0,0.2); z-index: 200;
+        position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; 
+        background: var(--surface); backdrop-filter: blur(50px) saturate(180%); -webkit-backdrop-filter: blur(50px) saturate(180%);
+        border-top-left-radius: 40px; border-top-right-radius: 40px;
+        box-shadow: 0 -10px 50px rgba(0,0,0,0.15); z-index: 200;
         padding: 0; box-sizing: border-box;
-        transition: bottom 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        transition: bottom 0.4s cubic-bezier(0.19, 1, 0.22, 1), transform 0.3s ease;
         display: flex; flex-direction: column; 
-        max-height: 85vh; overflow: hidden;
-        border: 1px solid var(--border);
+        max-height: 80vh; 
+        border: 1px solid var(--border); 
+        padding-bottom: max(20px, var(--safe-bottom));
     }
-    .bottom-sheet.active { bottom: 0; }
+    .bottom-sheet.active { bottom: 0; transform: translateX(-50%) translateY(0); }
 
-    .sheet-header {
-        padding: 24px 24px 10px; display: flex; justify-content: space-between; align-items: center;
-        border-bottom: 1px solid var(--border); background: var(--surface); z-index: 10;
-    }
-    .sheet-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
-    .sheet-content { padding: 20px 24px 40px; overflow-y: auto; }
+    .sheet-handle-bar { width: 100%; display: flex; justify-content: center; padding-top: 14px; padding-bottom: 6px; cursor: grab; flex-shrink: 0; }
+    .sheet-handle { width: 44px; height: 5px; background: rgba(0,0,0,0.2); border-radius: 10px; }
 
-    /* POINT LIST UI */
-    #point-list { display: flex; flex-direction: column; gap: 8px; }
-    .point-item {
-        display: flex; justify-content: space-between; align-items: center;
-        background: var(--surface); padding: 10px 12px 10px 16px; border-radius: 20px;
-        border: 1px solid var(--border); transition: all 0.2s;
-    }
+    .sheet-header { padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 10; flex-shrink: 0; }
+    .sheet-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.8px; color: var(--text); }
+    .sheet-content { padding: 24px 28px 40px; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+
+    /* UI LISTS */
+    #point-list { display: flex; flex-direction: column; gap: 12px; }
+    .point-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
     .point-left { display: flex; align-items: center; gap: 14px; }
-    .point-badge {
-        width: 32px; height: 32px; background: var(--primary); color: white;
-        border-radius: 10px; display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 0.9rem;
-    }
-    .point-name { font-weight: 700; color: var(--text); font-size: 0.95rem; }
+    .point-badge { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; }
+    .point-name { font-weight: 700; color: var(--text); font-size: 1rem; }
+    .point-type-icon { font-size: 1.2rem; opacity: 0.7; width: 24px; text-align: center; color:var(--text);}
     .point-controls { display: flex; align-items: center; gap: 14px; }
     .lock-wrapper { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .lock-label { font-size: 0.6rem; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); }
-    .btn-delete {
-        width: 38px; height: 38px; border-radius: 12px; border: none;
-        background: rgba(239, 68, 68, 0.1); color: var(--danger);
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; font-size: 1rem; transition: all 0.2s;
-    }
+    .btn-delete { width: 42px; height: 42px; border-radius: 14px; border: none; background: rgba(255, 59, 48, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; }
     .btn-delete:active { background: var(--danger); color: white; transform: scale(0.92); }
-    .point-item.locked .point-badge { background: #94a3b8; }
-    .point-item.locked .point-name { opacity: 0.6; }
+    .point-item.locked .point-badge { background: #8e8e93; } .point-item.locked .point-name { opacity: 0.6; }
 
     /* ACCORDION */
-    .accordion-item { border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; background: var(--surface); }
-    .accordion-header {
-        padding: 16px 20px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-        background: rgba(0,0,0,0.02); transition: background 0.2s;
-    }
-    .accordion-header:active { background: rgba(0,0,0,0.05); }
-    .accordion-body { display: none; padding: 20px; border-top: 1px solid var(--border); }
+    .accordion-item { border: 1px solid var(--border); border-radius: 24px; margin-bottom: 12px; overflow: hidden; background: rgba(255,255,255,0.05); }
+    .accordion-header { padding: 20px 24px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); transition: background 0.2s; color: var(--text); }
+    .accordion-header:active { background: rgba(255,255,255,0.1); }
+    .accordion-body { display: none; padding: 24px; border-top: 1px solid var(--border); }
     .accordion-item.open .accordion-body { display: block; }
     .accordion-item.open .arrow { transform: rotate(180deg); }
-    .arrow { transition: transform 0.3s; font-size: 0.8rem; opacity: 0.5; }
+    .arrow { transition: transform 0.3s; font-size: 0.8rem; opacity: 0.5; color:var(--text); }
 
-    /* UI ELEMENTS */
-    .st-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 600; font-size: 0.95rem; }
-    .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .theme-btn {
-        height: 50px; border-radius: 12px; cursor: pointer;
-        border: 2px solid var(--border); background: var(--btn-bg);
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-        font-size: 0.8rem; font-weight: 700; color: var(--text);
-        transition: all 0.2s;
-    }
-    .theme-btn.active { border-color: var(--primary); background: var(--surface); color: var(--primary); }
+    /* SETTINGS UI */
+    .st-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 700; font-size: 0.95rem; color:var(--text); }
+    .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+    .extra-themes { display: none; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .extra-themes.active { display: grid; }
+    
+    .theme-btn { height: 60px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: var(--btn-bg); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: var(--text); transition: all 0.2s; position: relative; overflow: hidden; }
+    .theme-btn.active { border: 2px solid var(--primary); background: var(--surface); color: var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
     .theme-dot { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); }
+    .btn-more-themes { width: 100%; padding: 16px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 20px; font-weight: 700; cursor: pointer; color: var(--primary); margin-top: 12px; transition: all 0.2s; }
+    .btn-more-themes:active { transform: scale(0.98); background: rgba(0,0,0,0.06); }
 
-    .switch { position: relative; width: 44px; height: 24px; }
+    .switch { position: relative; width: 52px; height: 32px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border); border-radius: 34px; transition: .3s; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    input:checked + .slider { background-color: var(--primary); }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: rgba(120,120,128,0.2); border-radius: 34px; transition: .3s; }
+    .slider:before { position: absolute; content: ""; height: 28px; width: 28px; left: 2px; bottom: 2px; background-color: white; border-radius: 50%; transition: .3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    input:checked + .slider { background-color: #34c759; }
     input:checked + .slider:before { transform: translateX(20px); }
     
-    input[type=range] { width: 100%; height: 6px; background: var(--border); border-radius: 10px; accent-color: var(--primary); margin-top: 10px; }
-    input[type=number] { width: 50px; padding: 6px; border-radius: 8px; border: 1px solid var(--border); text-align: center; font-weight: 700; font-family: inherit; background: var(--bg); color: var(--text); }
+    input[type=range] { width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 10px; accent-color: var(--primary); margin-top: 10px; }
+    input[type=number] { width: 60px; padding: 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); text-align: center; font-weight: 700; font-family: inherit; background: rgba(255,255,255,0.5); color: #000; }
 
     .btn-close { background: rgba(0,0,0,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center;}
-
-    .toast {
-        position: fixed; top: 100px; left: 50%; transform: translateX(-50%) translateY(-20px);
-        background: var(--text); color: var(--bg); padding: 12px 24px;
-        border-radius: 30px; font-size: 0.9rem; font-weight: 600; pointer-events: none;
-        opacity: 0; transition: all 0.3s; z-index: 300; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    }
+    .toast { position: fixed; top: 110px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: var(--text); padding: 14px 28px; border-radius: 40px; font-size: 0.95rem; font-weight: 600; pointer-events: none; opacity: 0; transition: all 0.3s; z-index: 300; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+    /* Layout Cards */
+    .layout-card { padding: 15px; border-radius: 16px; border: 1px solid var(--border); background: rgba(0,0,0,0.05); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+    .layout-card.selected { border: 2px solid var(--primary); background: rgba(0,122,255,0.1); }
+    .layout-icon { font-size: 1.5rem; } .layout-info { display: flex; flex-direction: column; }
+    .layout-name { font-weight: 800; font-size: 0.9rem; } .layout-desc { font-size: 0.7rem; opacity: 0.6; }
 </style>
 </head>
 <body>
 
+    <div id="liquid-mesh" class="special-bg-layer mesh-gradient"></div>
+    <div id="liquid-noise" class="noise-overlay"></div>
+
     <div id="loading-screen">
-        <div class="spinner"></div>
-        <div class="loading-brand">GeoLab v9.6</div>
+        <div class="holo-container">
+            <div class="holo-liquid"></div>
+            <div class="holo-ring"></div>
+            <div class="holo-core"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#007aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
+        </div>
+        <div class="loading-text">GeoLab v11.2</div>
     </div>
 
-    <div id="confirm-modal" class="custom-popup glass-panel">
+    <div id="confirm-modal" class="custom-popup">
         <div class="popup-title">Clear Board?</div>
         <div class="popup-desc">This will remove all points and connections. This action cannot be undone.</div>
-        <div class="popup-actions">
-            <button class="popup-btn btn-cancel" onclick="closePopup()">Cancel</button>
-            <button class="popup-btn btn-confirm" onclick="confirmClear()">Clear All</button>
-        </div>
+        <div class="popup-actions"><button class="popup-btn btn-cancel" onclick="closePopup()">Cancel</button><button class="popup-btn btn-confirm" onclick="confirmClear()">Clear All</button></div>
     </div>
 
     <div id="debug-hud">
@@ -310,7 +349,7 @@
     </div>
 
     <header class="glass-panel">
-        <div class="brand-title">GeoLab <span class="dev-badge">v9.6</span></div>
+        <div class="brand-title">GeoLab <span class="dev-badge">v11.2</span></div>
         <div class="header-actions">
             <button class="btn-icon-only btn-filled" onclick="toggleToolbar()">🛠️</button>
             <button class="btn-icon-only btn-help" onclick="toggleHelp()">?</button>
@@ -324,63 +363,114 @@
         <div class="tool-opt selected" id="tool-drag" onclick="setTool('drag')"><span class="tool-icon">✋</span>Drag</div>
         <div class="tool-opt" id="tool-connect" onclick="setTool('connect')"><span class="tool-icon">🔗</span>Link</div>
         <div class="tool-opt" id="tool-point" onclick="setTool('point')"><span class="tool-icon">🔵</span>Point</div>
-        <div class="tool-opt disabled" id="tool-tangent" onclick="setTool('tangent')">
-            <div class="lock-badge">🔒</div>
-            <span class="tool-icon">📐</span>Tan
-        </div>
+        <div class="tool-opt" id="tool-line" onclick="setTool('line')"><span class="tool-icon">📏</span>Line</div>
+        <div class="tool-opt" id="tool-corner" onclick="setTool('corner')"><span class="tool-icon">⎣</span>Corner</div>
+        <div class="tool-opt disabled" id="tool-tangent" onclick="setTool('tangent')"><div class="lock-badge">🔒</div><span class="tool-icon">📐</span>Tan</div>
     </div>
 
     <div id="overlay" class="modal-overlay" onclick="closeAllModals()"></div>
 
     <div id="help-modal" class="bottom-sheet">
-        <div class="sheet-header">
-            <span class="sheet-title">How to Use</span>
-            <button class="btn-close" onclick="closeAllModals()">×</button>
-        </div>
+        <div class="sheet-handle-bar"><div class="sheet-handle"></div></div>
+        <div class="sheet-header"><span class="sheet-title">How to Use</span><button class="btn-close" onclick="closeAllModals()">×</button></div>
         <div class="sheet-content">
             <div class="help-card"><div class="help-icon">✋</div><div class="help-text"><h4>Drag Tool</h4><p>Move pins, points, or rotate circles.</p></div></div>
             <div class="help-card"><div class="help-icon">🔗</div><div class="help-text"><h4>Link Tool</h4><p>Connect two points to measure angles.</p></div></div>
             <div class="help-card"><div class="help-icon">🔵</div><div class="help-text"><h4>Point Tool</h4><p>Tap canvas to create free points.</p></div></div>
-            <div class="help-card" style="opacity:0.6"><div class="help-icon">📐</div><div class="help-text"><h4>Tangent</h4><p>Temporarily Disabled.</p></div></div>
+            <div class="help-card"><div class="help-icon">📏</div><div class="help-text"><h4>Line Tool</h4><p>Draw straight 0° or 90° lines.</p></div></div>
+            <div class="help-card"><div class="help-icon">⎣</div><div class="help-text"><h4>Corner Tool</h4><p>Draw "L" shape (Creates A-B-C).</p></div></div>
         </div>
     </div>
 
     <div id="points-modal" class="bottom-sheet">
-        <div class="sheet-header">
-            <span class="sheet-title">Active Points</span>
-            <button class="btn-close" onclick="closeAllModals()">×</button>
-        </div>
-        <div class="sheet-content" id="point-list">
-            <div style="text-align:center; opacity:0.5; padding:20px;">No points created yet.</div>
-        </div>
+        <div class="sheet-handle-bar"><div class="sheet-handle"></div></div>
+        <div class="sheet-header"><span class="sheet-title">Active Points</span><button class="btn-close" onclick="closeAllModals()">×</button></div>
+        <div class="sheet-content" id="point-list"><div style="text-align:center; opacity:0.5; padding:20px; color:var(--text);">No points created yet.</div></div>
     </div>
 
     <div id="settings-modal" class="bottom-sheet">
-        <div class="sheet-header">
-            <span class="sheet-title">Settings</span>
-            <button class="btn-close" onclick="closeAllModals()">×</button>
-        </div>
+        <div class="sheet-handle-bar"><div class="sheet-handle"></div></div>
+        <div class="sheet-header"><span class="sheet-title">Settings</span><button class="btn-close" onclick="closeAllModals()">×</button></div>
         <div class="sheet-content">
             
             <div class="accordion-item open">
+                <div class="accordion-header" onclick="toggleAccordion(this)"><span>UI Layout (Mobile)</span><span class="arrow">▼</span></div>
+                <div class="accordion-body">
+                    <div style="display:grid; grid-template-columns:1fr; gap:10px;">
+                        <div class="layout-card" id="layout-classic" onclick="setLayout('classic')"><div class="layout-icon">📱</div><div class="layout-info"><span class="layout-name">Classic</span><span class="layout-desc">Header Top, Controls Bottom</span></div></div>
+                        <div class="layout-card" id="layout-split" onclick="setLayout('split')"><div class="layout-icon">🔃</div><div class="layout-info"><span class="layout-name">Split</span><span class="layout-desc">Controls Top, Header Bottom</span></div></div>
+                        <div class="layout-card" id="layout-onehand" onclick="setLayout('onehand')"><div class="layout-icon">👍</div><div class="layout-info"><span class="layout-name">One-Hand</span><span class="layout-desc">Everything Bottom (Easy Reach)</span></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)"><span>Visual Theme</span><span class="arrow">▼</span></div>
                 <div class="accordion-body">
                     <div class="theme-grid">
+                        <div class="theme-btn" id="th-liquid-2" onclick="selectTheme('liquid-2')"><div class="theme-dot" style="background:#007AFF"></div>Liquid</div>
                         <div class="theme-btn" id="th-modern" onclick="selectTheme('modern')"><div class="theme-dot" style="background:#0ea5e9"></div>Ice</div>
-                        <div class="theme-btn" id="th-liquid" onclick="selectTheme('liquid')"><div class="theme-dot" style="background:linear-gradient(135deg, #7F00FF, #E100FF)"></div>Liquid</div>
+                        <div class="theme-btn" id="th-liquid" onclick="selectTheme('liquid')"><div class="theme-dot" style="background:linear-gradient(135deg, #7F00FF, #E100FF)"></div>Dark</div>
                         <div class="theme-btn" id="th-midnight" onclick="selectTheme('midnight')"><div class="theme-dot" style="background:#0f172a"></div>Night</div>
                         <div class="theme-btn" id="th-blueprint" onclick="selectTheme('blueprint')"><div class="theme-dot" style="background:#2563eb"></div>Blue</div>
+                    </div>
+                    
+                    <div class="extra-themes" id="extra-themes">
+                        <div class="theme-btn" id="th-synthwave" onclick="selectTheme('synthwave')"><div class="theme-dot" style="background:linear-gradient(to right, #ff00ff, #00ffff)"></div>Synth</div>
+                        <div class="theme-btn" id="th-cherry" onclick="selectTheme('cherry')"><div class="theme-dot" style="background:#ff69b4"></div>Cherry</div>
+                        <div class="theme-btn" id="th-gold" onclick="selectTheme('gold')"><div class="theme-dot" style="background:#ffd700"></div>Gold</div>
+                        <div class="theme-btn" id="th-ocean" onclick="selectTheme('ocean')"><div class="theme-dot" style="background:#0074D9"></div>Ocean</div>
                         <div class="theme-btn" id="th-cyber" onclick="selectTheme('cyber')"><div class="theme-dot" style="background:#00ff9d"></div>Cyber</div>
                         <div class="theme-btn" id="th-paper" onclick="selectTheme('paper')"><div class="theme-dot" style="background:#d6d3d1"></div>Paper</div>
+                        <div class="theme-btn" id="th-sunset" onclick="selectTheme('sunset')"><div class="theme-dot" style="background:linear-gradient(to right, #f97316, #db2777)"></div>Sunset</div>
+                        <div class="theme-btn" id="th-forest" onclick="selectTheme('forest')"><div class="theme-dot" style="background:#166534"></div>Forest</div>
+                        <div class="theme-btn" id="th-dracula" onclick="selectTheme('dracula')"><div class="theme-dot" style="background:#bd93f9"></div>Dracula</div>
+                        <div class="theme-btn" id="th-terminal" onclick="selectTheme('terminal')"><div class="theme-dot" style="background:#33ff00"></div>Term</div>
+                        <div class="theme-btn" id="th-cream" onclick="selectTheme('cream')"><div class="theme-dot" style="background:#d4c4a8"></div>Cream</div>
+                        <div class="theme-btn" id="th-lavender" onclick="selectTheme('lavender')"><div class="theme-dot" style="background:#a78bfa"></div>Lavender</div>
+                        <div class="theme-btn" id="th-slate" onclick="selectTheme('slate')"><div class="theme-dot" style="background:#64748b"></div>Slate</div>
+                        <div class="theme-btn" id="th-nebula" onclick="selectTheme('nebula')"><div class="theme-dot" style="background:#7c4dff"></div>Nebula</div>
+                        <div class="theme-btn" id="th-coffee" onclick="selectTheme('coffee')"><div class="theme-dot" style="background:#3e2723"></div>Coffee</div>
+                        <div class="theme-btn" id="th-retro" onclick="selectTheme('retro')"><div class="theme-dot" style="background:#4a4a40"></div>Retro</div>
+                        <div class="theme-btn" id="th-mint" onclick="selectTheme('mint')"><div class="theme-dot" style="background:#26a69a"></div>Mint</div>
+                        <div class="theme-btn" id="th-matrix" onclick="selectTheme('matrix')"><div class="theme-dot" style="background:#0f0"></div>Matrix</div>
+                        <div class="theme-btn" id="th-vapor" onclick="selectTheme('vapor')"><div class="theme-dot" style="background:#ff71ce"></div>Vapor</div>
+                        <div class="theme-btn" id="th-nord" onclick="selectTheme('nord')"><div class="theme-dot" style="background:#81a1c1"></div>Nord</div>
+                        <div class="theme-btn" id="th-gruvbox" onclick="selectTheme('gruvbox')"><div class="theme-dot" style="background:#fabd2f"></div>Gruv</div>
+                        <div class="theme-btn" id="th-highcon" onclick="selectTheme('highcon')"><div class="theme-dot" style="background:#fff; border:1px solid #000"></div>Hi-C</div>
+                        <div class="theme-btn" id="th-toxic" onclick="selectTheme('toxic')"><div class="theme-dot" style="background:#ccff00"></div>Toxic</div>
                     </div>
+                    <button class="btn-more-themes" id="btn-toggle-themes" onclick="toggleThemes()">More...</button>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)"><span>Drag Tool & Grid Physics</span><span class="arrow">▼</span></div>
+                <div class="accordion-body">
+                    <div style="font-size:0.7rem; text-transform:uppercase; font-weight:800; color:var(--primary); margin-bottom:8px;">Rotational Snap (Angles)</div>
+                    <div class="st-row"><span>Enable Angle Snap</span><label class="switch"><input type="checkbox" id="opt-snap-active" onchange="updateSettings()"><span class="slider"></span></label></div>
+                    <div class="st-row"><span>Snap Step (Deg)</span><input type="number" id="opt-snap-val" value="5" min="0.1" max="90" step="0.5" onchange="updateSettings()"></div>
+                    <div class="st-row"><span>Magnet Strength</span><strong id="lbl-snap-threshold" style="color:var(--primary)">2°</strong></div>
+                    <input type="range" id="opt-snap-threshold" min="0.1" max="10" step="0.1" value="2.0" oninput="updateSettings()">
+                    
+                    <hr style="border:0; border-top:1px dashed rgba(0,0,0,0.1); margin:15px 0;">
+
+                    <div style="font-size:0.7rem; text-transform:uppercase; font-weight:800; color:var(--primary); margin-bottom:8px;">Positional Snap (Grid)</div>
+                    <div class="st-row"><span>Enable Grid Snap</span><label class="switch"><input type="checkbox" id="opt-grid-snap" onchange="updateSettings()"><span class="slider"></span></label></div>
+                    <div class="st-row"><span>Grid Size (px)</span><input type="number" id="opt-grid-size" value="40" min="10" max="200" step="5" onchange="updateSettings()"></div>
+                    <div class="st-row"><span>Grid Magnet</span><strong id="lbl-grid-threshold" style="color:var(--primary)">10px</strong></div>
+                    <input type="range" id="opt-grid-threshold" min="1" max="50" step="1" value="10" oninput="updateSettings()">
                 </div>
             </div>
 
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)"><span>Workspace</span><span class="arrow">▼</span></div>
                 <div class="accordion-body">
-                    <div class="st-row"><span>Center Hub</span><label class="switch"><input type="checkbox" id="opt-show-center" onchange="updateSettings()"><span class="slider"></span></label></div>
-                    <div class="st-row"><span>Ring Protractors</span><label class="switch"><input type="checkbox" id="opt-show-ring" onchange="updateSettings()"><span class="slider"></span></label></div>
+                    <div class="st-row"><span>Center Hub</span><label class="switch"><input type="checkbox" id="opt-show-center-body" onchange="updateSettings()"><span class="slider"></span></label></div>
+                    <div class="st-row"><span>Center Pin</span><label class="switch"><input type="checkbox" id="opt-show-center-pin" onchange="updateSettings()"><span class="slider"></span></label></div>
+                    <hr style="border:0; border-top:1px solid rgba(0,0,0,0.1); margin:12px 0;">
+                    <div class="st-row"><span>Ring Bodies</span><label class="switch"><input type="checkbox" id="opt-show-ring-body" onchange="updateSettings()"><span class="slider"></span></label></div>
+                    <div class="st-row"><span>Ring Pins</span><label class="switch"><input type="checkbox" id="opt-show-ring-pin" onchange="updateSettings()"><span class="slider"></span></label></div>
                     <div class="st-row"><span>Angle Labels</span><label class="switch"><input type="checkbox" id="opt-always-show" onchange="updateSettings()"><span class="slider"></span></label></div>
                     <div class="st-row"><span>Grid</span><label class="switch"><input type="checkbox" id="opt-show-grid" onchange="updateSettings()"><span class="slider"></span></label></div>
                     <div class="st-row" style="margin-top:10px;"><span>Text Scale: <strong id="lbl-text-scale" style="color:var(--primary)">1.0x</strong></span></div>
@@ -391,16 +481,15 @@
             </div>
 
             <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)"><span>Controls</span><span class="arrow">▼</span></div>
+                <div class="accordion-header" onclick="toggleAccordion(this)"><span>Performance</span><span class="arrow">▼</span></div>
                 <div class="accordion-body">
-                    <div class="st-row"><span>Snap Rotation</span><label class="switch"><input type="checkbox" id="opt-snap-active" onchange="updateSettings()"><span class="slider"></span></label></div>
-                    <div class="st-row"><span>Snap (Deg)</span><input type="number" id="opt-snap-val" value="5" min="1" max="90" onchange="updateSettings()"></div>
+                    <div class="st-row"><span>Low Power Mode</span><label class="switch"><input type="checkbox" id="opt-low-power" onchange="updateSettings()"><span class="slider"></span></label></div>
                     <div class="st-row"><span>Reflex Angles</span><label class="switch"><input type="checkbox" id="opt-reflex" onchange="updateSettings()"><span class="slider"></span></label></div>
                     <div class="st-row"><span>Show Hitboxes</span><label class="switch"><input type="checkbox" id="opt-show-hitboxes" onchange="updateSettings()"><span class="slider"></span></label></div>
                 </div>
             </div>
 
-            <button style="background:#fee2e2; color:#b91c1c; width:100%; padding:14px; border:none; border-radius:16px; font-weight:700; margin-top:20px;" onclick="resetSettings()">Reset App</button>
+            <button style="background:rgba(255,59,48,0.15); color:#ff3b30; width:100%; padding:14px; border:none; border-radius:16px; font-weight:700; margin-top:20px;" onclick="resetSettings()">Reset App</button>
         </div>
     </div>
 
@@ -417,39 +506,47 @@
 <script>
     // --- THEME ENGINE ---
     const THEMES = {
-        'modern': { 
-            bg: '#f0f9ff', transparentCanvas: false, c_bg: '#f0f9ff', 
-            surface: 'rgba(255, 255, 255, 0.95)', 
-            text: '#0c4a6e', primary: '#0ea5e9', border: 'rgba(14, 165, 233, 0.2)', 
-            btn_bg: 'rgba(255,255,255,0.6)', btn_text: '#0f172a',
-            c_grid: '#e0f2fe', c_line: '#0284c7', c_text: '#0c4a6e', c_pin: '#0ea5e9', 
-            font: "'Inter', sans-serif", blur:'24px' 
-        },
-        'liquid': { 
-            bg: 'radial-gradient(at 0% 0%, hsla(280,100%,20%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(240,100%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(320,100%,30%,1) 0, transparent 50%), radial-gradient(at 0% 50%, hsla(340,100%,30%,1) 0, transparent 50%), radial-gradient(at 100% 50%, hsla(260,100%,20%,1) 0, transparent 50%), #0f0c29', 
-            transparentCanvas: true, c_bg: 'rgba(255, 255, 255, 0)', surface: 'rgba(0, 0, 0, 0.4)', 
-            text: '#ffffff', primary: '#00d2ff', border: 'rgba(255, 255, 255, 0.3)', 
-            btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff',
-            c_grid: 'rgba(255, 255, 255, 0.1)', c_line: '#00d2ff', c_text: '#ffffff', c_pin: '#00d2ff', 
-            font: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", blur:'30px'
-        },
-        'midnight': { 
-            bg: '#020617', transparentCanvas: false, c_bg: '#020617', 
-            surface: 'rgba(15, 23, 42, 0.95)', text: '#f1f5f9', primary: '#38bdf8', 
-            border: 'rgba(255,255,255,0.15)', btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff',
-            c_grid: '#1e293b', c_line: '#38bdf8', c_text: '#e2e8f0', c_pin: '#0ea5e9', 
-            font: "'Inter', sans-serif", blur:'24px' 
-        },
-        'blueprint': { 
-            bg: '#172554', transparentCanvas: false, c_bg: '#172554', 
-            surface: 'rgba(30, 58, 138, 0.95)', text: '#dbeafe', primary: '#60a5fa', 
-            border: 'rgba(255,255,255,0.2)', btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff',
-            c_grid: 'rgba(255,255,255,0.1)', c_line: '#93c5fd', c_text: '#dbeafe', c_pin: '#3b82f6', 
-            font: "'Space Grotesk', sans-serif", blur:'24px' 
-        },
+        'liquid-2': { bg: 'transparent', transparentCanvas: true, c_bg: 'rgba(255,255,255,0.1)', surface: 'rgba(255, 255, 255, 0.45)', text: '#1d1d1f', primary: '#007aff', border: 'rgba(255,255,255,0.6)', btn_bg: 'rgba(255,255,255,0.2)', btn_text: '#000000', c_grid: 'rgba(0,0,0,0.05)', c_line: '#007aff', c_text: '#1d1d1f', c_pin: '#007aff', font: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif", blur: '40px', shadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 20px rgba(255,255,255,0.1)' },
+        'modern': { bg: '#f0f9ff', transparentCanvas: false, c_bg: '#f0f9ff', surface: 'rgba(255, 255, 255, 0.95)', text: '#0c4a6e', primary: '#0ea5e9', border: 'rgba(14, 165, 233, 0.2)', btn_bg: 'rgba(255,255,255,0.6)', btn_text: '#0f172a', c_grid: '#e0f2fe', c_line: '#0284c7', c_text: '#0c4a6e', c_pin: '#0ea5e9', font: "'Inter', sans-serif", blur:'24px' },
+        'liquid': { bg: 'radial-gradient(at 0% 0%, hsla(280,100%,20%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(240,100%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(320,100%,30%,1) 0, transparent 50%), radial-gradient(at 0% 50%, hsla(340,100%,30%,1) 0, transparent 50%), radial-gradient(at 100% 50%, hsla(260,100%,20%,1) 0, transparent 50%), #0f0c29', transparentCanvas: true, c_bg: 'rgba(255, 255, 255, 0)', surface: 'rgba(0, 0, 0, 0.4)', text: '#ffffff', primary: '#00d2ff', border: 'rgba(255, 255, 255, 0.3)', btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff', c_grid: 'rgba(255, 255, 255, 0.1)', c_line: '#00d2ff', c_text: '#ffffff', c_pin: '#00d2ff', font: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", blur:'30px' },
+        'midnight': { bg: '#020617', transparentCanvas: false, c_bg: '#020617', surface: 'rgba(15, 23, 42, 0.95)', text: '#f1f5f9', primary: '#38bdf8', border: 'rgba(255,255,255,0.15)', btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff', c_grid: '#1e293b', c_line: '#38bdf8', c_text: '#e2e8f0', c_pin: '#0ea5e9', font: "'Inter', sans-serif", blur:'24px' },
+        'blueprint': { bg: '#172554', transparentCanvas: false, c_bg: '#172554', surface: 'rgba(30, 58, 138, 0.95)', text: '#dbeafe', primary: '#60a5fa', border: 'rgba(255,255,255,0.2)', btn_bg: 'rgba(255,255,255,0.1)', btn_text: '#ffffff', c_grid: 'rgba(255,255,255,0.1)', c_line: '#93c5fd', c_text: '#dbeafe', c_pin: '#3b82f6', font: "'Space Grotesk', sans-serif", blur:'24px' },
         'cyber': { bg: '#000000', transparentCanvas: false, c_bg: '#000000', surface: 'rgba(10,10,10,0.9)', text: '#00ff9d', primary: '#00ff9d', border: '#00ff9d', btn_bg: 'rgba(0,255,157,0.1)', btn_text:'#00ff9d', c_grid: 'rgba(0,255,157,0.1)', c_line: '#00ff9d', c_text: '#00ff9d', c_pin: '#ffffff', font: "'JetBrains Mono', monospace", blur:'24px' },
-        'paper': { bg: '#f5f5f4', transparentCanvas: false, c_bg: '#f5f5f4', surface: 'rgba(255,255,255,0.9)', text: '#292524', primary: '#ea580c', border: 'rgba(0,0,0,0.1)', btn_bg: 'rgba(0,0,0,0.05)', btn_text:'#292524', c_grid: 'rgba(0,0,0,0.05)', c_line: '#44403c', c_text: '#292524', c_pin: '#ea580c', font: "'Crimson Pro', serif", blur:'24px' }
+        'paper': { bg: '#f5f5f4', transparentCanvas: false, c_bg: '#f5f5f4', surface: 'rgba(255, 255, 255, 0.9)', text: '#292524', primary: '#ea580c', border: 'rgba(0,0,0,0.1)', btn_bg: 'rgba(0,0,0,0.05)', btn_text:'#292524', c_grid: 'rgba(0,0,0,0.05)', c_line: '#44403c', c_text: '#292524', c_pin: '#ea580c', font: "'Crimson Pro', serif", blur:'24px' },
+        'sunset': { bg: 'linear-gradient(135deg, #4c1d95, #c026d3, #f97316)', transparentCanvas: true, c_bg: 'rgba(0,0,0,0)', surface: 'rgba(255,255,255,0.15)', text: '#fff', primary: '#fbbf24', border: 'rgba(255,255,255,0.2)', btn_bg:'rgba(255,255,255,0.1)', btn_text:'#fff', c_grid:'rgba(255,255,255,0.1)', c_line:'#fbbf24', c_text:'#fff', c_pin:'#fcd34d', font:"'Inter', sans-serif", blur:'40px' },
+        'forest': { bg: '#052e16', transparentCanvas: false, c_bg: '#052e16', surface: 'rgba(20, 83, 45, 0.95)', text: '#dcfce7', primary: '#4ade80', border: 'rgba(255,255,255,0.1)', btn_bg:'rgba(0,0,0,0.2)', btn_text:'#dcfce7', c_grid:'rgba(255,255,255,0.05)', c_line:'#22c55e', c_text:'#dcfce7', c_pin:'#4ade80', font:"'Inter', sans-serif", blur:'24px' },
+        'dracula': { bg: '#282a36', transparentCanvas: false, c_bg: '#282a36', surface: 'rgba(68, 71, 90, 0.95)', text: '#f8f8f2', primary: '#bd93f9', border: '#6272a4', btn_bg:'rgba(255,255,255,0.05)', btn_text:'#f8f8f2', c_grid:'#44475a', c_line:'#bd93f9', c_text:'#f8f8f2', c_pin:'#ff79c6', font:"'JetBrains Mono', monospace", blur:'24px' },
+        'terminal': { bg: '#000000', transparentCanvas: false, c_bg: '#000000', surface: 'rgba(0, 20, 0, 0.95)', text: '#00ff00', primary: '#00ff00', border: '#003300', btn_bg:'rgba(0,50,0,0.3)', btn_text:'#00ff00', c_grid:'#003300', c_line:'#00cc00', c_text:'#00ff00', c_pin:'#00ff00', font:"'Courier New', monospace", blur:'0px' },
+        'cream': { bg: '#fdf6e3', transparentCanvas: false, c_bg: '#fdf6e3', surface: 'rgba(238, 232, 213, 0.95)', text: '#657b83', primary: '#cb4b16', border: 'rgba(0,0,0,0.05)', btn_bg:'rgba(0,0,0,0.03)', btn_text:'#586e75', c_grid:'rgba(0,0,0,0.05)', c_line:'#93a1a1', c_text:'#657b83', c_pin:'#d33682', font:"'Crimson Pro', serif", blur:'24px' },
+        'lavender': { bg: '#f5f3ff', transparentCanvas: false, c_bg: '#f5f3ff', surface: 'rgba(255, 255, 255, 0.9)', text: '#5b21b6', primary: '#8b5cf6', border: 'rgba(139, 92, 246, 0.1)', btn_bg:'rgba(139, 92, 246, 0.05)', btn_text:'#4c1d95', c_grid:'rgba(139, 92, 246, 0.05)', c_line:'#8b5cf6', c_text:'#5b21b6', c_pin:'#a78bfa', font:"'Inter', sans-serif", blur:'24px' },
+        'slate': { bg: '#0f172a', transparentCanvas: false, c_bg: '#0f172a', surface: 'rgba(30, 41, 59, 0.95)', text: '#cbd5e1', primary: '#94a3b8', border: 'rgba(255,255,255,0.1)', btn_bg:'rgba(255,255,255,0.05)', btn_text:'#fff', c_grid:'#1e293b', c_line:'#64748b', c_text:'#94a3b8', c_pin:'#cbd5e1', font:"'Inter', sans-serif", blur:'24px' },
+        'synthwave': { bg: '#2b213a', transparentCanvas: false, c_bg: '#2b213a', surface: 'rgba(43, 33, 58, 0.9)', text: '#ff00ff', primary: '#00ffff', border: '#ff00ff', btn_bg:'rgba(255,0,255,0.1)', btn_text:'#ff00ff', c_grid:'rgba(0,255,255,0.1)', c_line:'#00ffff', c_text:'#ff00ff', c_pin:'#fff', font:"'Space Grotesk', sans-serif", blur:'20px' },
+        'cherry': { bg: '#fff0f5', transparentCanvas: false, c_bg: '#fff0f5', surface: 'rgba(255, 255, 255, 0.9)', text: '#8b0000', primary: '#ff69b4', border: 'rgba(255,105,180,0.3)', btn_bg:'rgba(255,105,180,0.1)', btn_text:'#8b0000', c_grid:'rgba(255,182,193,0.3)', c_line:'#db7093', c_text:'#8b0000', c_pin:'#ff1493', font:"'Crimson Pro', serif", blur:'24px' },
+        'gold': { bg: '#000000', transparentCanvas: false, c_bg: '#000000', surface: 'rgba(20, 20, 20, 0.95)', text: '#ffd700', primary: '#ffd700', border: '#b8860b', btn_bg:'rgba(255,215,0,0.1)', btn_text:'#ffd700', c_grid:'rgba(184,134,11,0.2)', c_line:'#ffd700', c_text:'#fff', c_pin:'#ffd700', font:"'Playfair Display', serif", blur:'30px' },
+        'ocean': { bg: '#001f3f', transparentCanvas: false, c_bg: '#001f3f', surface: 'rgba(0, 31, 63, 0.9)', text: '#7fdbff', primary: '#39cccc', border: '#0074d9', btn_bg:'rgba(0,116,217,0.2)', btn_text:'#7fdbff', c_grid:'rgba(127,219,255,0.1)', c_line:'#39cccc', c_text:'#7fdbff', c_pin:'#ffffff', font:"'Inter', sans-serif", blur:'24px' },
+        'nebula': { bg: '#1a0b2e', transparentCanvas: false, c_bg: '#1a0b2e', surface: 'rgba(45, 27, 78, 0.9)', text: '#e0d4fc', primary: '#d4bbff', border: 'rgba(112, 0, 255, 0.3)', btn_bg:'rgba(112,0,255,0.1)', btn_text:'#e0d4fc', c_grid:'rgba(112,0,255,0.1)', c_line:'#b388ff', c_text:'#e0d4fc', c_pin:'#7c4dff', font:"'Space Grotesk', sans-serif", blur:'30px' },
+        'coffee': { bg: '#3e2723', transparentCanvas: false, c_bg: '#3e2723', surface: 'rgba(78, 52, 46, 0.95)', text: '#efebe9', primary: '#d7ccc8', border: 'rgba(141, 110, 99, 0.3)', btn_bg:'rgba(255,255,255,0.05)', btn_text:'#efebe9', c_grid:'rgba(255,255,255,0.05)', c_line:'#bcaaa4', c_text:'#efebe9', c_pin:'#d7ccc8', font:"'Inter', sans-serif", blur:'20px' },
+        'retro': { bg: '#e0e0ce', transparentCanvas: false, c_bg: '#e0e0ce', surface: 'rgba(190, 190, 175, 0.9)', text: '#4a4a40', primary: '#d65d0e', border: '#909080', btn_bg:'rgba(0,0,0,0.05)', btn_text:'#4a4a40', c_grid:'rgba(0,0,0,0.1)', c_line:'#4a4a40', c_text:'#4a4a40', c_pin:'#d65d0e', font:"'Courier New', monospace", blur:'0px' },
+        'mint': { bg: '#e0f7fa', transparentCanvas: false, c_bg: '#e0f7fa', surface: 'rgba(255, 255, 255, 0.9)', text: '#00695c', primary: '#26a69a', border: 'rgba(0, 150, 136, 0.2)', btn_bg:'rgba(0,150,136,0.1)', btn_text:'#004d40', c_grid:'rgba(0,150,136,0.1)', c_line:'#4db6ac', c_text:'#00695c', c_pin:'#00897b', font:"'Inter', sans-serif", blur:'24px' },
+        'matrix': { bg: '#000000', transparentCanvas: false, c_bg: '#000000', surface: 'rgba(0, 20, 0, 0.9)', text: '#00ff00', primary: '#00ff00', border: '#004400', btn_bg:'rgba(0,50,0,0.3)', btn_text:'#00ff00', c_grid:'rgba(0,50,0,0.3)', c_line:'#00cc00', c_text:'#00ff00', c_pin:'#00ff00', font:"'Courier New', monospace", blur:'0px' },
+        'vapor': { bg: '#ff71ce', transparentCanvas: true, c_bg: 'linear-gradient(to bottom, #ff71ce, #01cdfe)', surface: 'rgba(255, 255, 255, 0.4)', text: '#fff', primary: '#fff', border: 'rgba(255,255,255,0.5)', btn_bg:'rgba(255,255,255,0.2)', btn_text:'#fff', c_grid:'rgba(255,255,255,0.2)', c_line:'#fff', c_text:'#fff', c_pin:'#fff', font:"'Space Grotesk', sans-serif", blur:'20px' },
+        'nord': { bg: '#2e3440', transparentCanvas: false, c_bg: '#2e3440', surface: 'rgba(46, 52, 64, 0.95)', text: '#d8dee9', primary: '#88c0d0', border: '#4c566a', btn_bg:'rgba(255,255,255,0.05)', btn_text:'#d8dee9', c_grid:'rgba(35,39,48,0.5)', c_line:'#81a1c1', c_text:'#eceff4', c_pin:'#5e81ac', font:"'Inter', sans-serif", blur:'20px' },
+        'gruvbox': { bg: '#282828', transparentCanvas: false, c_bg: '#282828', surface: 'rgba(40, 40, 40, 0.95)', text: '#ebdbb2', primary: '#fabd2f', border: '#504945', btn_bg:'rgba(255,255,255,0.05)', btn_text:'#ebdbb2', c_grid:'rgba(60,56,54,0.5)', c_line:'#fe8019', c_text:'#ebdbb2', c_pin:'#b8bb26', font:"'Courier New', monospace", blur:'0px' },
+        'highcon': { bg: '#ffffff', transparentCanvas: false, c_bg: '#ffffff', surface: '#ffffff', text: '#000000', primary: '#000000', border: '#000000', btn_bg:'#ffffff', btn_text:'#000000', c_grid:'rgba(0,0,0,0.5)', c_line:'#000000', c_text:'#000000', c_pin:'#000000', font:"sans-serif", blur:'0px' },
+        'toxic': { bg: '#111111', transparentCanvas: false, c_bg: '#111111', surface: 'rgba(20, 20, 20, 0.9)', text: '#ccff00', primary: '#ccff00', border: '#ccff00', btn_bg:'rgba(204,255,0,0.1)', btn_text:'#ccff00', c_grid:'rgba(204,255,0,0.2)', c_line:'#ccff00', c_text:'#ccff00', c_pin:'#ffffff', font:"'JetBrains Mono', monospace", blur:'0px' }
     };
+
+    function toggleThemes() {
+        const extra = document.getElementById('extra-themes');
+        const btn = document.getElementById('btn-toggle-themes');
+        if (extra.classList.contains('active')) {
+            extra.classList.remove('active');
+            btn.innerText = "More...";
+        } else {
+            extra.classList.add('active');
+            btn.innerText = "Less";
+        }
+    }
 
     function getCheck(id) { const el = document.getElementById(id); return el ? el.checked : false; }
     function getVal(id) { const el = document.getElementById(id); return el ? el.value : ""; }
@@ -459,7 +556,17 @@
     const canvas = document.getElementById('geoCanvas');
     const ctx = canvas.getContext('2d');
 
-    const DEFAULTS = { currentTheme: 'modern', showGrid: true, showCenter: true, showRing: true, alwaysShowAngles: true, snapRotation: false, snapIncrement: 5, showHitboxes: false, textScale: 1.0, protractorCount: 8, strictPhysics: true };
+    const DEFAULTS = { 
+        currentTheme: 'modern', showGrid: true,
+        showCenterBody: true, showCenterPin: true, 
+        showRingBody: true, showRingPin: true,
+        alwaysShowAngles: true, 
+        snapRotation: true, snapIncrement: 5, snapThreshold: 2.0, 
+        gridSnap: false, gridSize: 40, gridThreshold: 10,
+        showHitboxes: false, textScale: 1.0, protractorCount: 8, strictPhysics: true,
+        layout: 'classic', lowPower: false
+    };
+    
     let appSettings = {...DEFAULTS};
     try { const s=JSON.parse(localStorage.getItem('geoSettings')); if(s) appSettings={...DEFAULTS,...s}; } catch(e){}
     if(!THEMES[appSettings.currentTheme]) appSettings.currentTheme='modern';
@@ -491,10 +598,14 @@
     function closePopup() {
         document.getElementById('confirm-modal').classList.remove('active');
         document.getElementById('overlay').classList.remove('active');
+        if(history.state && history.state.modal) history.back();
     }
     function confirmClear() {
         strings = []; freePoints = []; tangents = [];
-        closePopup(); draw(); showToast("Board Cleared");
+        document.getElementById('confirm-modal').classList.remove('active');
+        document.getElementById('overlay').classList.remove('active');
+        if(history.state && history.state.modal) history.back();
+        draw(); showToast("Board Cleared");
     }
 
     function toggleAccordion(header) { const item = header.parentElement; item.classList.toggle('open'); }
@@ -502,15 +613,60 @@
     
     function toggleToolbar() { document.getElementById('toolbar').classList.toggle('active'); }
 
-    function closeAllModals() {
-        document.querySelectorAll('.bottom-sheet').forEach(el => el.classList.remove('active'));
+    // --- SMART MODAL SYSTEM WITH HISTORY SUPPORT ---
+    function closeAllModals(fromHistory = false) {
+        document.querySelectorAll('.bottom-sheet').forEach(el => {
+            el.classList.remove('active');
+            el.style.transform = 'translateX(-50%) translateY(0)'; 
+        });
         document.getElementById('overlay').classList.remove('active');
         document.getElementById('confirm-modal').classList.remove('active');
+        if (!fromHistory && history.state && history.state.modal) { history.back(); }
     }
-    function openModal(id) { closeAllModals(); document.getElementById(id).classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+
+    function openModal(id) { 
+        document.querySelectorAll('.bottom-sheet').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); 
+        document.getElementById('overlay').classList.add('active');
+        history.pushState({modal: true, id: id}, null, "");
+    }
+    
     function toggleHelp() { openModal('help-modal'); }
     function toggleSettings() { openModal('settings-modal'); }
     function togglePointsModal() { renderPointList(); openModal('points-modal'); }
+
+    window.addEventListener('popstate', (event) => { closeAllModals(true); });
+
+    // --- SWIPE TO CLOSE LOGIC ---
+    let dragStartY = 0;
+    let currentSheet = null;
+
+    document.addEventListener('touchstart', (e) => {
+        const sheet = e.target.closest('.bottom-sheet');
+        if (!sheet) return;
+        const content = sheet.querySelector('.sheet-content');
+        if (content && content.scrollTop > 0 && !e.target.closest('.sheet-header') && !e.target.closest('.sheet-handle-bar')) return;
+        dragStartY = e.touches[0].clientY;
+        currentSheet = sheet;
+        sheet.style.transition = 'none';
+    }, {passive: false});
+
+    document.addEventListener('touchmove', (e) => {
+        if (!currentSheet) return;
+        const deltaY = e.touches[0].clientY - dragStartY;
+        if (deltaY > 0) { 
+            if(e.cancelable) e.preventDefault(); 
+            currentSheet.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
+        }
+    }, {passive: false});
+
+    document.addEventListener('touchend', (e) => {
+        if (!currentSheet) return;
+        const deltaY = e.changedTouches[0].clientY - dragStartY;
+        currentSheet.style.transition = 'bottom 0.4s cubic-bezier(0.19, 1, 0.22, 1), transform 0.3s ease';
+        if (deltaY > 80) { closeAllModals(); } else { currentSheet.style.transform = 'translateX(-50%) translateY(0)'; }
+        currentSheet = null;
+    });
 
     function setTool(t) {
         if (t === 'tangent') return;
@@ -524,16 +680,14 @@
     function renderPointList() {
         const list = document.getElementById('point-list');
         list.innerHTML = "";
-        if(freePoints.length === 0) { list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px;">No points created.</div>`; return; }
+        if(freePoints.length === 0) { list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px; color:var(--text);">No points created.</div>`; return; }
         freePoints.forEach(p => {
             const row = document.createElement('div');
             row.className = `point-item ${p.locked ? 'locked' : ''}`;
+            let icon = '🔵'; if (p.type === 'corner') icon = '⎣'; else if (p.type === 'line') icon = '📏';
             row.innerHTML = `
-                <div class="point-left"><div class="point-badge">${p.label}</div><span class="point-name">Point ${p.label}</span></div>
-                <div class="point-controls">
-                    <div class="lock-wrapper"><span class="lock-label">Lock</span><label class="switch"><input type="checkbox" ${p.locked ? 'checked' : ''} onchange="togglePointLock(${p.id})"><span class="slider"></span></label></div>
-                    <button class="btn-delete" onclick="deletePoint(${p.id})">✕</button>
-                </div>`;
+                <div class="point-left"><div class="point-type-icon">${icon}</div><div class="point-badge">${p.label}</div><span class="point-name">Point ${p.label}</span></div>
+                <div class="point-controls"><div class="lock-wrapper"><span class="lock-label">Lock</span><label class="switch"><input type="checkbox" ${p.locked ? 'checked' : ''} onchange="togglePointLock(${p.id})"><span class="slider"></span></label></div><button class="btn-delete" onclick="deletePoint(${p.id})">✕</button></div>`;
             list.appendChild(row);
         });
     }
@@ -550,11 +704,55 @@
     }
 
     function selectTheme(name) { appSettings.currentTheme = name; updateSettings(); applyTheme(); }
+    function setLayout(layout) { appSettings.layout = layout; updateSettings(); applyLayout(); }
+
+    function applyLayout() {
+        const r = document.querySelector(':root');
+        document.querySelectorAll('.layout-card').forEach(c => c.classList.remove('selected'));
+        const activeCard = document.getElementById('layout-' + appSettings.layout);
+        if(activeCard) activeCard.classList.add('selected');
+
+        if (appSettings.layout === 'classic') {
+            r.style.setProperty('--header-pos-top', 'max(12px, var(--safe-top))');
+            r.style.setProperty('--header-pos-bottom', 'auto');
+            r.style.setProperty('--controls-pos-bottom', 'max(30px, var(--safe-bottom))');
+            r.style.setProperty('--controls-pos-top', 'auto');
+            r.style.setProperty('--toolbar-top', '50%');
+            r.style.setProperty('--toolbar-left', '16px');
+            r.style.setProperty('--toolbar-right', 'auto');
+            r.style.setProperty('--toolbar-transform', 'translate(-200%, -50%)');
+            r.style.setProperty('--toolbar-active-transform', 'translate(0, -50%)');
+            r.style.setProperty('--toolbar-direction', 'column');
+        } else if (appSettings.layout === 'split') {
+            r.style.setProperty('--header-pos-top', 'auto');
+            r.style.setProperty('--header-pos-bottom', 'max(30px, var(--safe-bottom))');
+            r.style.setProperty('--controls-pos-bottom', 'auto');
+            r.style.setProperty('--controls-pos-top', 'max(12px, var(--safe-top))');
+            r.style.setProperty('--toolbar-top', '50%');
+            r.style.setProperty('--toolbar-left', 'auto');
+            r.style.setProperty('--toolbar-right', '16px');
+            r.style.setProperty('--toolbar-transform', 'translate(200%, -50%)');
+            r.style.setProperty('--toolbar-active-transform', 'translate(0, -50%)');
+            r.style.setProperty('--toolbar-direction', 'column');
+        } else if (appSettings.layout === 'onehand') {
+            r.style.setProperty('--header-pos-top', 'auto');
+            r.style.setProperty('--header-pos-bottom', '90px');
+            r.style.setProperty('--controls-pos-bottom', '20px');
+            r.style.setProperty('--controls-pos-top', 'auto');
+            r.style.setProperty('--toolbar-top', 'auto');
+            r.style.setProperty('--toolbar-left', '50%');
+            r.style.setProperty('--toolbar-right', 'auto');
+            r.style.setProperty('--toolbar-transform', 'translate(-50%, 200%)');
+            r.style.setProperty('--toolbar-active-transform', 'translate(-50%, -150px)');
+            r.style.setProperty('--toolbar-direction', 'row');
+        }
+    }
 
     function applyTheme() {
         const t = THEMES[appSettings.currentTheme] || THEMES['modern'];
         const r = document.querySelector(':root');
         
+        // Basic Vars
         r.style.setProperty('--bg', t.bg); 
         r.style.setProperty('--surface', t.surface); 
         r.style.setProperty('--text', t.text);
@@ -565,15 +763,26 @@
         r.style.setProperty('--btn-bg', t.btn_bg || 'rgba(0,0,0,0.05)');
         r.style.setProperty('--btn-text', t.btn_text || t.text);
         
+        if (t.shadow) r.style.setProperty('--shadow', t.shadow);
+        else r.style.setProperty('--shadow', '0 25px 50px -12px rgba(0, 0, 0, 0.25)');
+
+        // Toggle Special Liquid Layers
+        const mesh = document.getElementById('liquid-mesh');
+        const noise = document.getElementById('liquid-noise');
+        
+        if (appSettings.currentTheme === 'liquid-2') {
+            mesh.style.opacity = appSettings.lowPower ? '0' : '1';
+            noise.style.opacity = appSettings.lowPower ? '0' : '0.05';
+            r.style.setProperty('--saturation', '200%'); 
+        } else {
+            mesh.style.opacity = '0';
+            noise.style.opacity = '0';
+            r.style.setProperty('--saturation', '100%'); 
+        }
+        
         document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
         const btn = document.getElementById('th-' + appSettings.currentTheme);
         if(btn) btn.classList.add('active');
-        
-        document.body.style.background = t.bg;
-        document.body.style.backgroundSize = "300% 300%"; 
-        
-        if(appSettings.currentTheme === 'liquid') document.body.classList.add('liquid-mode');
-        else document.body.classList.remove('liquid-mode');
         
         draw();
     }
@@ -581,19 +790,41 @@
     function updateSettings() { 
         appSettings.alwaysShowAngles = getCheck('opt-always-show'); 
         appSettings.showGrid = getCheck('opt-show-grid'); 
+        
+        // Rotation Snap
         appSettings.snapRotation = getCheck('opt-snap-active');
-        appSettings.snapIncrement = parseInt(getVal('opt-snap-val')) || 5;
+        appSettings.snapIncrement = parseFloat(getVal('opt-snap-val')) || 5;
+        appSettings.snapThreshold = parseFloat(getVal('opt-snap-threshold')) || 2.0;
+        
+        // Position Snap
+        appSettings.gridSnap = getCheck('opt-grid-snap');
+        appSettings.gridSize = parseInt(getVal('opt-grid-size')) || 40;
+        appSettings.gridThreshold = parseInt(getVal('opt-grid-threshold')) || 10;
+        
         appSettings.strictPhysics = !getCheck('opt-reflex');
-        appSettings.textScale = parseFloat(getVal('opt-text-scale')) || 1.0; 
-        appSettings.showCenter = getCheck('opt-show-center'); 
-        appSettings.showRing = getCheck('opt-show-ring');
+        
+        appSettings.showCenterBody = getCheck('opt-show-center-body');
+        appSettings.showCenterPin = getCheck('opt-show-center-pin');
+        appSettings.showRingBody = getCheck('opt-show-ring-body');
+        appSettings.showRingPin = getCheck('opt-show-ring-pin');
+        
         appSettings.showHitboxes = getCheck('opt-show-hitboxes');
+        appSettings.lowPower = getCheck('opt-low-power');
+        
+        if (appSettings.lowPower) document.body.parentElement.classList.add('low-power');
+        else document.body.parentElement.classList.remove('low-power');
+        
         document.getElementById('lbl-text-scale').innerText = appSettings.textScale + "x";
         document.getElementById('lbl-count').innerText = parseInt(getVal('opt-count')) || 8;
+        
+        document.getElementById('lbl-snap-threshold').innerText = appSettings.snapThreshold + "°";
+        document.getElementById('lbl-grid-threshold').innerText = appSettings.gridThreshold + "px";
+        
         const newCount = parseInt(getVal('opt-count')) || 8; 
         if (newCount !== appSettings.protractorCount) { appSettings.protractorCount = newCount; initProtractors(); } 
         localStorage.setItem('geoSettings', JSON.stringify(appSettings)); 
         applyTheme();
+        applyLayout();
     }
 
     function resetSettings() { if(confirm("Reset Everything?")) { appSettings = {...DEFAULTS}; localStorage.setItem('geoSettings', JSON.stringify(appSettings)); initUI(); strings=[]; freePoints=[]; tangents=[]; initProtractors(); closeAllModals(); } }
@@ -601,27 +832,53 @@
 
     function initUI() { 
         try { 
-            setTimeout(()=>{var s=document.getElementById('loading-screen');if(s){s.style.opacity='0';setTimeout(()=>{if(s)s.style.display='none';},600);}},1000);
+            const loader = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.transform = 'translateY(-20px) scale(0.95)';
+                setTimeout(() => { loader.style.display = 'none'; }, 600);
+            }, 1200);
+
             document.getElementById('opt-always-show').checked = appSettings.alwaysShowAngles; 
             document.getElementById('opt-show-grid').checked = appSettings.showGrid; 
+            
             document.getElementById('opt-snap-active').checked = appSettings.snapRotation;
             document.getElementById('opt-snap-val').value = appSettings.snapIncrement;
+            document.getElementById('opt-snap-threshold').value = appSettings.snapThreshold;
+            
+            document.getElementById('opt-grid-snap').checked = appSettings.gridSnap;
+            document.getElementById('opt-grid-size').value = appSettings.gridSize;
+            document.getElementById('opt-grid-threshold').value = appSettings.gridThreshold;
+            
             document.getElementById('opt-reflex').checked = !appSettings.strictPhysics; 
-            document.getElementById('opt-show-center').checked = appSettings.showCenter; 
-            document.getElementById('opt-show-ring').checked = appSettings.showRing;
+            
+            document.getElementById('opt-show-center-body').checked = appSettings.showCenterBody; 
+            document.getElementById('opt-show-center-pin').checked = appSettings.showCenterPin; 
+            document.getElementById('opt-show-ring-body').checked = appSettings.showRingBody;
+            document.getElementById('opt-show-ring-pin').checked = appSettings.showRingPin;
+            
             document.getElementById('opt-show-hitboxes').checked = appSettings.showHitboxes;
+            document.getElementById('opt-low-power').checked = appSettings.lowPower;
+            
             document.getElementById('lbl-text-scale').innerText = appSettings.textScale + "x"; 
             document.getElementById('opt-text-scale').value = appSettings.textScale;
             document.getElementById('opt-count').value = appSettings.protractorCount;
             document.getElementById('lbl-count').innerText = appSettings.protractorCount;
+            
+            document.getElementById('lbl-snap-threshold').innerText = appSettings.snapThreshold + "°";
+            document.getElementById('lbl-grid-threshold').innerText = appSettings.gridThreshold + "px";
+            
+            if (appSettings.lowPower) document.body.parentElement.classList.add('low-power');
             applyTheme();
+            applyLayout();
         } catch(e) {} 
     }
 
     function resize() {
         width = window.innerWidth; height = window.innerHeight;
-        const dpr = Math.min(window.devicePixelRatio || 2, 3);
-        const cw = Math.min(width * 0.95, 800); const ch = Math.min(height * 0.75, 900);
+        const dpr = appSettings.lowPower ? 1 : Math.min(window.devicePixelRatio || 2, 3);
+        const cw = width < 600 ? width - 8 : Math.min(width * 0.95, 800); 
+        const ch = Math.min(height * 0.75, 900);
         canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
         canvas.width = cw * dpr; canvas.height = ch * dpr; 
         ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr); 
@@ -640,7 +897,7 @@
             const theta = (this.id / appSettings.protractorCount) * Math.PI * 2 - (Math.PI/2);
             this.pivotX = centerX + boardRadius * Math.cos(theta); this.pivotY = centerY + boardRadius * Math.sin(theta); this.r = protractorRadius;
             
-            if (appSettings.showRing) {
+            if (appSettings.showRingBody) {
                 ctx.save(); ctx.translate(this.pivotX, this.pivotY); ctx.rotate(this.angle); 
                 ctx.beginPath(); ctx.arc(0, 0, this.r, 0, Math.PI, false); ctx.closePath();
                 const g = ctx.createLinearGradient(0, -this.r, 0, 0); 
@@ -651,9 +908,16 @@
                 this.drawScale(ctx, this.r, t); ctx.restore(); 
             }
             if(appSettings.showHitboxes || debugMode) { ctx.beginPath(); ctx.arc(this.pivotX, this.pivotY, this.r, 0, Math.PI*2); ctx.fillStyle = "rgba(255,0,0,0.1)"; ctx.fill(); ctx.strokeStyle = "rgba(255,0,0,0.5)"; ctx.stroke(); }
-            this.drawPin(ctx, t);
+            
+            if (appSettings.showRingPin) this.drawPin(ctx, t);
         }
         drawScale(ctx, r, t) {
+            if(appSettings.lowPower) { // Optimized drawing for old phones
+                ctx.textAlign = "center"; ctx.textBaseline = "middle"; 
+                ctx.font = `600 ${r * 0.13}px ${t.font.split(',')[0]}`; ctx.fillStyle = t.c_text;
+                ctx.beginPath(); ctx.moveTo(r, 0); ctx.lineTo(-r, 0); ctx.stroke();
+                return;
+            }
             ctx.textAlign = "center"; ctx.textBaseline = "middle"; const scale = appSettings.textScale || 1.0;
             const fs = Math.max(9, r * 0.13) * scale; ctx.font = `600 ${fs}px ${t.font.split(',')[0]}`; ctx.fillStyle = t.c_text;
             for (let i = 0; i <= 180; i++) { 
@@ -673,20 +937,26 @@
 
     function drawCenterProtractor(ctx, t) {
         ctx.save(); ctx.translate(centerX, centerY); const r = centerProtractorRadius;
-        if(appSettings.showCenter) {
+        
+        if(appSettings.showCenterBody) {
             ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fillStyle = t.transparentCanvas ? 'rgba(255,255,255,0.1)' : t.c_bg; ctx.fill(); ctx.strokeStyle = t.c_line; ctx.lineWidth = 2; ctx.stroke();
-            const scale = appSettings.textScale || 1.0; ctx.font = `600 ${Math.max(9, r * 0.09) * scale}px ${t.font.split(',')[0]}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = t.c_text;
-            for (let i = 0; i < 360; i+=15) { 
-                const rad = (i*Math.PI)/180; const c = Math.cos(rad); const s = Math.sin(rad); 
-                const l = (i%30===0)? r*0.12 : r*0.06; 
-                ctx.beginPath(); ctx.moveTo(r*c, r*s); ctx.lineTo((r-l)*c, (r-l)*s); ctx.strokeStyle = t.c_text; ctx.stroke(); 
-                if (i % 45 === 0) { const tr = r * 0.70; ctx.fillText(i, tr*c, tr*s); } 
+            if(!appSettings.lowPower) {
+                const scale = appSettings.textScale || 1.0; ctx.font = `600 ${Math.max(9, r * 0.09) * scale}px ${t.font.split(',')[0]}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = t.c_text;
+                for (let i = 0; i < 360; i+=15) { 
+                    const rad = (i*Math.PI)/180; const c = Math.cos(rad); const s = Math.sin(rad); 
+                    const l = (i%30===0)? r*0.12 : r*0.06; 
+                    ctx.beginPath(); ctx.moveTo(r*c, r*s); ctx.lineTo((r-l)*c, (r-l)*s); ctx.strokeStyle = t.c_text; ctx.stroke(); 
+                    if (i % 45 === 0) { const tr = r * 0.70; ctx.fillText(i, tr*c, tr*s); } 
+                }
             }
         }
-        if(appSettings.showHitboxes || debugMode) { ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fillStyle = "rgba(0,0,255,0.1)"; ctx.fill(); ctx.strokeStyle = "rgba(0,0,255,0.5)"; ctx.stroke(); }
-        const isHover = (hoveredPinID===CENTER_ID||activeStringStartID===CENTER_ID);
-        ctx.beginPath(); ctx.arc(0, 0, r*0.15, 0, Math.PI*2); ctx.fillStyle = isHover ? t.primary : t.c_pin; ctx.fill(); ctx.strokeStyle=t.c_bg; ctx.lineWidth=3; ctx.stroke();
-        if (isHover) { ctx.beginPath(); ctx.arc(0, 0, r*0.35, 0, Math.PI*2); ctx.fillStyle=t.primary; ctx.globalAlpha=0.2; ctx.fill(); ctx.globalAlpha=1.0; } 
+        if(appSettings.showHitboxes || debugMode) { ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fillStyle = "rgba(0,0,255,0.1)"; ctx.fill(); ctx.strokeStyle = "rgba(255,0,0,255)"; ctx.stroke(); }
+        
+        if(appSettings.showCenterPin) {
+            const isHover = (hoveredPinID===CENTER_ID||activeStringStartID===CENTER_ID);
+            ctx.beginPath(); ctx.arc(0, 0, r*0.15, 0, Math.PI*2); ctx.fillStyle = isHover ? t.primary : t.c_pin; ctx.fill(); ctx.strokeStyle=t.c_bg; ctx.lineWidth=3; ctx.stroke();
+            if (isHover) { ctx.beginPath(); ctx.arc(0, 0, r*0.35, 0, Math.PI*2); ctx.fillStyle=t.primary; ctx.globalAlpha=0.2; ctx.fill(); ctx.globalAlpha=1.0; } 
+        }
         ctx.restore();
     }
 
@@ -733,8 +1003,10 @@
             angs.forEach(a => { let r = a - p.angle; r %= (Math.PI*2); if (r<0) r+=Math.PI*2; if (!appSettings.strictPhysics || r <= Math.PI+0.001) rels.push(r); }); rels.sort((a,b)=>a-b); 
             if (rels.length === 1) drawWedge(ctx, p, 0, rels[0], t); else if (rels.length >= 2) for(let i=0; i<rels.length-1; i++) drawWedge(ctx, p, rels[i], rels[i+1], t); 
         }); 
-        if (appSettings.showCenter && (appSettings.alwaysShowAngles || hoveredPinID === CENTER_ID || activeStringStartID === CENTER_ID)) { 
-            const cAngs = getAllConnectedAngles(CENTER_ID); if (cAngs.length >= 2) for(let i=0; i<cAngs.length; i++) { let d = cAngs[(i+1)%cAngs.length] - cAngs[i]; if(d<0) d+=Math.PI*2; if(d<=Math.PI) drawWedge(ctx, centerObj, cAngs[i], cAngs[(i+1)%cAngs.length], t); } 
+        if (appSettings.showCenterBody || appSettings.showCenterPin) { 
+            if (appSettings.alwaysShowAngles || hoveredPinID === CENTER_ID || activeStringStartID === CENTER_ID) { 
+                const cAngs = getAllConnectedAngles(CENTER_ID); if (cAngs.length >= 2) for(let i=0; i<cAngs.length; i++) { let d = cAngs[(i+1)%cAngs.length] - cAngs[i]; if(d<0) d+=Math.PI*2; if(d<=Math.PI) drawWedge(ctx, centerObj, cAngs[i], cAngs[(i+1)%cAngs.length], t); } 
+            }
         }
         freePoints.forEach(p => {
              if (!appSettings.alwaysShowAngles && p.id !== hoveredPinID && p.id !== activeStringStartID) return; 
@@ -754,7 +1026,7 @@
         ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,p.r,s,e); ctx.closePath(); ctx.fillStyle = t.primary; ctx.globalAlpha = 0.15; ctx.fill(); ctx.globalAlpha = 1.0;
         ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(p.r*Math.cos(s), p.r*Math.sin(s)); ctx.strokeStyle=t.primary; ctx.lineWidth=2; ctx.setLineDash([2,2]); ctx.stroke(); 
         ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(p.r*Math.cos(e), p.r*Math.sin(e)); ctx.stroke(); ctx.setLineDash([]); 
-        if(parseFloat(deg)>2) { 
+        if(parseFloat(deg)>2 && !appSettings.lowPower) { 
             let diff = e - s; if (diff < 0) diff += Math.PI * 2; let mid = s + diff / 2;
             const dist = p.r * 0.65;
             ctx.translate(dist*Math.cos(mid), dist*Math.sin(mid)); ctx.rotate(-p.angle); 
@@ -788,25 +1060,47 @@
         
         ctx.clearRect(0,0,width,height); 
         
+        // Draw Dynamic Grid
         if(appSettings.showGrid) {
             ctx.fillStyle = t.c_grid; ctx.strokeStyle = t.c_grid;
-            if(t.gridType === 'dots') { for(let x=20; x<width; x+=30) for(let y=20; y<height; y+=30) { ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill(); } } 
-            else { ctx.lineWidth = 1; ctx.beginPath(); for(let x=0; x<width; x+=40) { ctx.moveTo(x,0); ctx.lineTo(x,height); } for(let y=0; y<height; y+=40) { ctx.moveTo(0,y); ctx.lineTo(width,y); } ctx.stroke(); }
+            const size = appSettings.gridSize || 40;
+            if(t.gridType === 'dots' && !appSettings.lowPower) { 
+                for(let x=size; x<width; x+=size) for(let y=size; y<height; y+=size) { ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill(); } 
+            } else { 
+                ctx.lineWidth = 1; ctx.beginPath(); 
+                for(let x=0; x<width; x+=size) { ctx.moveTo(x,0); ctx.lineTo(x,height); } 
+                for(let y=0; y<height; y+=size) { ctx.moveTo(0,y); ctx.lineTo(width,y); } 
+                ctx.stroke(); 
+            }
         }
-        ctx.shadowBlur = t.glow; ctx.shadowColor = t.primary;
+        ctx.shadowBlur = appSettings.lowPower ? 0 : (t.glow || 0); ctx.shadowColor = t.primary;
         drawCenterProtractor(ctx, t);
         protractors.forEach(p=>p.draw(ctx, t)); 
         drawFreePoints(ctx, t);
         ctx.shadowBlur = 0; ctx.lineCap='round'; 
         strings.forEach(l => { 
-            if(!appSettings.showCenter && (l.start === CENTER_ID || l.end === CENTER_ID)) return;
             const p1 = getPinPos(l.start); const p2 = getPinPos(l.end); 
             if(!p1 || !p2) return;
             ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineWidth=4; ctx.strokeStyle=t.c_bg; ctx.stroke(); ctx.strokeStyle=t.c_line; ctx.lineWidth=3; ctx.stroke(); 
         }); 
-        ctx.shadowBlur = t.glow; ctx.shadowColor = t.primary;
+        ctx.shadowBlur = appSettings.lowPower ? 0 : (t.glow || 0); ctx.shadowColor = t.primary;
         drawReadings(ctx, t); 
-        if((activeStringStartID!==null) && lastPos) { 
+        
+        if (currentTool === 'line' && activeStringStartID !== null) {
+            const startP = getPinPos(activeStringStartID);
+            ctx.beginPath(); ctx.moveTo(startP.x, startP.y); ctx.lineTo(ptrX, ptrY);
+            ctx.strokeStyle = t.primary; ctx.lineWidth = 2; ctx.setLineDash([6,4]); ctx.stroke(); ctx.setLineDash([]);
+        }
+        else if (currentTool === 'corner' && activeStringStartID !== null) {
+            const startP = getPinPos(activeStringStartID);
+            ctx.beginPath(); 
+            ctx.moveTo(startP.x, startP.y); 
+            ctx.lineTo(ptrX, startP.y); 
+            ctx.lineTo(ptrX, ptrY); 
+            ctx.strokeStyle = t.primary; ctx.lineWidth = 2; ctx.setLineDash([6,4]); ctx.stroke(); ctx.setLineDash([]);
+            ctx.beginPath(); ctx.arc(ptrX, startP.y, 4, 0, Math.PI*2); ctx.fillStyle = t.primary; ctx.fill();
+        }
+        else if((activeStringStartID!==null) && lastPos) { 
             const startID = activeStringStartID;
             const p1 = getPinPos(startID);
             ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(lastPos.x, lastPos.y); ctx.strokeStyle=t.c_line; ctx.lineWidth=2; ctx.setLineDash([5,5]); ctx.stroke(); ctx.setLineDash([]); 
@@ -817,13 +1111,13 @@
     function getPointer(e) { const r = canvas.getBoundingClientRect(); const cx = e.touches?e.touches[0].clientX:e.clientX; const cy = e.touches?e.touches[0].clientY:e.clientY; return (r.width===0)?{x:0,y:0}:{x:(cx-r.left)*(width/r.width), y:(cy-r.top)*(height/r.height)}; }
     function getIDAt(x,y) { 
         for(let p of freePoints) { if(Math.hypot(x - p.x, y - p.y) < 20) return p.id; }
-        if(Math.hypot(x-centerX, y-centerY) < centerProtractorRadius * 0.4) return CENTER_ID; 
-        for(let p of protractors) if(Math.hypot(x-p.pivotX, y-p.pivotY) < protractorRadius * 0.4) return p.id; 
+        if(appSettings.showCenterPin && Math.hypot(x-centerX, y-centerY) < centerProtractorRadius * 0.4) return CENTER_ID; 
+        if(appSettings.showRingPin) { for(let p of protractors) if(Math.hypot(x-p.pivotX, y-p.pivotY) < protractorRadius * 0.4) return p.id; }
         return null; 
     }
     function checkCircleHit(x,y) { 
-        for(let i=protractors.length-1; i>=0; i--) if(Math.hypot(x-protractors[i].pivotX, y-protractors[i].pivotY)<protractors[i].r) return protractors[i].id;
-        if(appSettings.showCenter && Math.hypot(x-centerX, y-centerY) < centerObj.r) return CENTER_ID;
+        if (appSettings.showRingBody) { for(let i=protractors.length-1; i>=0; i--) if(Math.hypot(x-protractors[i].pivotX, y-protractors[i].pivotY)<protractors[i].r) return protractors[i].id; }
+        if(appSettings.showCenterBody && Math.hypot(x-centerX, y-centerY) < centerObj.r) return CENTER_ID; 
         return null; 
     }
 
@@ -832,11 +1126,29 @@
         const p = getPointer(e); lastPos=p; ptrX=p.x; ptrY=p.y; 
         let idHit = getIDAt(p.x, p.y);
         let circleHitID = checkCircleHit(p.x, p.y);
+        
         if (currentTool === 'point') { 
             const label = String.fromCharCode(65 + (freePoints.length % 26)); 
-            freePoints.push({id: uniquePointID++, x: p.x, y: p.y, locked: false, label: label}); 
+            freePoints.push({id: uniquePointID++, x: p.x, y: p.y, locked: false, label: label, type: 'free'}); 
             draw(); showToast("Point Created"); return; 
         }
+        
+        if (currentTool === 'line') {
+            const startID = uniquePointID++;
+            const label = String.fromCharCode(65 + (freePoints.length % 26));
+            freePoints.push({id: startID, x: p.x, y: p.y, locked: false, label: label, type: 'line'});
+            activeStringStartID = startID; 
+            draw(); return;
+        }
+
+        if (currentTool === 'corner') {
+            const startID = uniquePointID++;
+            const label = String.fromCharCode(65 + (freePoints.length % 26));
+            freePoints.push({id: startID, x: p.x, y: p.y, locked: false, label: label, type: 'corner'});
+            activeStringStartID = startID; 
+            draw(); return;
+        }
+
         if (currentTool === 'drag') {
             if (idHit !== null && idHit >= 2000) {
                 const point = freePoints.find(fp => fp.id === idHit);
@@ -856,18 +1168,81 @@
     canvas.addEventListener('mousemove', e => { 
         if(e.cancelable) e.preventDefault(); 
         const p = getPointer(e); lastPos=p; ptrX=p.x; ptrY=p.y;
+        
+        if (currentTool === 'line' && activeStringStartID !== null) {
+            const startP = getPinPos(activeStringStartID);
+            const dx = p.x - startP.x; const dy = p.y - startP.y;
+            if (Math.abs(dx) > Math.abs(dy)) { ptrY = startP.y; } else { ptrX = startP.x; }
+            lastPos = {x: ptrX, y: ptrY}; 
+            draw(); return;
+        }
+        
+        if (currentTool === 'corner' && activeStringStartID !== null) { draw(); return; }
+
         const id = getIDAt(p.x, p.y); if(id!==hoveredPinID) { hoveredPinID=id; if(!draggingProtractor && !draggingPoint) draw(); } 
         if(activeStringStartID!==null) draw(); 
-        else if(draggingPoint) { draggingPoint.x = p.x + dragPointOffset.x; draggingPoint.y = p.y + dragPointOffset.y; draw(); }
+        else if(draggingPoint) { 
+            let nx = p.x + dragPointOffset.x;
+            let ny = p.y + dragPointOffset.y;
+            
+            // GRID SNAP LOGIC FOR DRAG TOOL
+            if (appSettings.gridSnap) {
+                const sz = appSettings.gridSize || 40;
+                const th = appSettings.gridThreshold || 10;
+                
+                // Calculate nearest grid lines
+                const snapX = Math.round(nx / sz) * sz;
+                const snapY = Math.round(ny / sz) * sz;
+                
+                // Apply magnetic snap
+                if (Math.abs(nx - snapX) < th) nx = snapX;
+                if (Math.abs(ny - snapY) < th) ny = snapY;
+            }
+            
+            draggingPoint.x = nx; 
+            draggingPoint.y = ny; 
+            draw(); 
+        }
         else if(draggingProtractor) { 
             const dx=p.x-draggingProtractor.pivotX; const dy=p.y-draggingProtractor.pivotY; 
-            let rawAngle=Math.atan2(dy,dx)+dragOffsetAngle; 
-            if (appSettings.snapRotation) { const s = (appSettings.snapIncrement || 5) * (Math.PI/180); rawAngle=Math.round(rawAngle/s)*s; } 
+            let rawAngle = Math.atan2(dy,dx) + dragOffsetAngle; 
+            
+            // ROTATION SNAP LOGIC
+            if (appSettings.snapRotation) {
+                const s = (appSettings.snapIncrement || 5) * (Math.PI/180);
+                const threshold = (appSettings.snapThreshold || 2.0) * (Math.PI/180);
+                const nearestSnap = Math.round(rawAngle / s) * s;
+                if (Math.abs(rawAngle - nearestSnap) < threshold) rawAngle = nearestSnap;
+            } 
+            
             draggingProtractor.angle=rawAngle; draw(); 
         } 
     });
     
     window.addEventListener('mouseup', e => { 
+        if (currentTool === 'line' && activeStringStartID !== null) {
+            const endID = uniquePointID++;
+            const label = String.fromCharCode(65 + (freePoints.length % 26));
+            freePoints.push({id: endID, x: ptrX, y: ptrY, locked: false, label: label, type: 'line'});
+            strings.push({start: activeStringStartID, end: endID});
+            showToast("Line Created");
+            activeStringStartID = null; draw(); return;
+        }
+
+        if (currentTool === 'corner' && activeStringStartID !== null) {
+            const startP = getPinPos(activeStringStartID);
+            const cornerID = uniquePointID++;
+            const labelB = String.fromCharCode(65 + (freePoints.length % 26));
+            freePoints.push({id: cornerID, x: ptrX, y: startP.y, locked: false, label: labelB, type: 'corner'});
+            const endID = uniquePointID++;
+            const labelC = String.fromCharCode(65 + (freePoints.length % 26));
+            freePoints.push({id: endID, x: ptrX, y: ptrY, locked: false, label: labelC, type: 'corner'});
+            strings.push({start: activeStringStartID, end: cornerID});
+            strings.push({start: cornerID, end: endID});
+            showToast("Corner Created");
+            activeStringStartID = null; draw(); return;
+        }
+
         if(activeStringStartID!==null) { 
             const end = getIDAt(lastPos.x, lastPos.y); 
             if(end!==null && end!==activeStringStartID) { 
@@ -875,11 +1250,9 @@
                 if(!exists) { 
                     strings.push({start:activeStringStartID, end:end}); 
                     showToast("Connected");
-                    
-                    // --- NEW LOGIC: AUTO-ALIGN HIDDEN RINGS ONLY ---
-                    if (!appSettings.showRing) {
+                    if (!appSettings.showRingBody) {
                         [activeStringStartID, end].forEach(pid => {
-                            if (pid < 100 && pid !== CENTER_ID) { // Check if it is a protractor
+                            if (pid < 100 && pid !== CENTER_ID) { 
                                 const p = protractors[pid];
                                 const angs = getAllConnectedAngles(p.id);
                                 if (angs.length > 0) {
@@ -897,7 +1270,6 @@
                             }
                         });
                     }
-                    // --- END NEW LOGIC ---
                 } 
             } 
             activeStringStartID=null; draw(); 
@@ -905,8 +1277,6 @@
         draggingProtractor=null; draggingPoint=null;
     });
 
-    // --- FIX FOR DOUBLE POINT CREATION ---
-    // We prevent default on touchstart to stop the browser from firing a backup 'mousedown'
     canvas.addEventListener('touchstart', e => { 
         if(e.cancelable) e.preventDefault(); 
         const touch = e.touches[0];
@@ -926,7 +1296,7 @@
         window.dispatchEvent(me); 
     });
 
-    window.onload = function() { initUI(); resize(); setTimeout(() => { const s = document.getElementById('loading-screen'); if(s){s.style.opacity='0';setTimeout(()=>{s.style.display='none';},600);} }, 1000); }; 
+    window.onload = function() { initUI(); resize(); }; 
     window.onresize = resize;
 </script>
 </body>
