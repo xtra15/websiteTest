@@ -1,0 +1,13 @@
+/* Points - Point list items and point-related controls */
+#point-list { display: flex; flex-direction: column; gap: 12px; }
+.point-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+.point-left { display: flex; align-items: center; gap: 14px; }
+.point-badge { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; }
+.point-name { font-weight: 700; color: var(--text); font-size: 1rem; }
+.point-type-icon { font-size: 1.2rem; opacity: 0.7; width: 24px; text-align: center; color:var(--text);}
+.point-controls { display: flex; align-items: center; gap: 14px; }
+.lock-wrapper { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.lock-label { font-size: 0.6rem; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); }
+.point-item.locked .point-badge { background: #8e8e93; } .point-item.locked .point-name { opacity: 0.6; }
+
+.empty-state { text-align: center; opacity: 0.5; padding: 20px; color: var(--text); }
