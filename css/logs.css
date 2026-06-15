@@ -1,7 +1,0 @@
-/* Logs - Development log entries */
-.log-entry { position: relative; padding-left: 30px; margin-bottom: 25px; }
-.log-entry::before { content: ''; position: absolute; left: 0; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); z-index: 2; box-shadow: 0 0 0 4px var(--surface); }
-.log-entry::after { content: ''; position: absolute; left: 5px; top: 10px; width: 2px; height: 100%; background: rgba(0,0,0,0.1); z-index: 1; }
-.log-entry:last-child::after { display: none; }
-.log-ver { font-weight: 800; font-size: 0.9rem; color: var(--primary); margin-bottom: 4px; display: block; letter-spacing: -0.5px; }
-.log-text { font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; opacity: 0.8; line-height: 1.5; color: var(--text); }

@@ -1,9 +1,0 @@
-/* HUD - Debug heads-up display */
-#debug-hud {
-    position: fixed; top: 90px; right: 20px; width: 180px;
-    background: rgba(0,0,0,0.7); backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
-    padding: 15px; font-family: 'JetBrains Mono', monospace; font-size: 10px;
-    color: #00ff9d; display: none; z-index: 500; pointer-events: none;
-}
-.hud-row { display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
